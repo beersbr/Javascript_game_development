@@ -1,0 +1,100 @@
+<html>
+<head>
+<title>Drawing some shapes</title>
+<style>
+  body{
+    display: block;
+  }
+  #canvas_a{
+    width: 500px;
+    height: 400px;
+    border: 3px solid #000000;
+    display: block;
+    margin: auto;
+  }
+</style>
+
+<script>
+  // w => 119
+  // a => 97
+  // s => 115
+  // d => 100
+
+  function key_pressed(){
+    var e = window.event || e;
+    console.log(e);
+    return String.fromCharCode(e.charCode);
+  }
+
+  window.onload = function(){
+    
+    keybuf = 0;
+    
+    document.onkeypress=function(e){
+      var e = window.event || e;
+      // console.log("CharCode value: "+e.charCode);
+      // console.log("Character: "+String.fromCharCode(e.charCode));
+      
+      // dont update till we act on the key
+      if(keybuf == 0){
+        keybuf = e.charCode;
+      }else{
+        console.log("keybuf is full: "+keybuf);
+      }
+      
+    }
+    
+    var buffer = document.getElementById("canvas_a");
+    var context = buffer.getContext('2d');
+    
+    context.moveTo(curx, cury);
+    context.lineWidth = 1.0;
+   
+    var curx = 50;
+    var cury = 50.5;
+    var newx = curx;
+    var newy = cury;
+    
+    function game_loop(){
+      console.log('iter: ');
+      
+      if(keybuf > 0){
+        newx = curx;
+        newy = cury;
+        
+        console.log('keybuf: '+keybuf);
+        if(keybuf == 119){ // w
+          newy -= 1;
+        }
+        if(keybuf == 97){ // a
+          newx -= 1;
+        }
+        if(keybuf == 115){ // s
+          newy += 1;
+        }
+        if(keybuf == 100){ // d
+          newx += 1;
+        }
+        
+        keybuf = 0;
+        // context.moveTo(curx, cury);
+        context.lineTo(newx, newy);
+        context.stroke();
+      }
+      
+      curx = newx; cury = newy;
+    }
+    
+    console.log(context);
+    
+    var exit = false;
+    
+    setInterval(game_loop, 1000/60);
+  }
+</script>
+
+</head>
+<body>
+  <canvas id='canvas_a'></canvas>
+</body>
+</html>
