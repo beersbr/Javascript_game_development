@@ -6,8 +6,8 @@
     display: block;
   }
   #canvas_a{
-    width: 500px;
-    height: 400px;
+    width: 800px;
+    height: 600px;
     border: 3px solid #000000;
     display: block;
     margin: auto;
@@ -42,7 +42,7 @@
     var buffer = document.getElementById("canvas_a");
     var context = buffer.getContext('2d');
 
-    var curx = 50;
+    var curx = 50.5;
     var cury = 50.5; // we have to shift 0.5 because of the way canvas draws, see: https://developer.mozilla.org/En/Canvas_tutorial/Applying_styles_and_colors
     var newx = curx;
     var newy = cury;
@@ -87,6 +87,6 @@
 
 </head>
 <body>
-  <canvas id='canvas_a'></canvas>
+  <canvas id='canvas_a' width='800px' height='600px'></canvas>
 </body>
 </html>
