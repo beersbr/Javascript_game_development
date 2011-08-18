@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Key States</title>
+<style>
+  body{
+    display: block;
+  }
+  #canvas_a{
+    width: 400px;
+    height: 300px;
+    border: 3px solid #000000;
+    display: block;
+    margin: auto;
+  }
+</style>
+
+<script>
+  // A quick reminder of key codes as returned by javascript
+  // w => 119
+  // a => 97
+  // s => 115
+  // d => 100
+
+function Game(){
+  this.canvas = -1;
+  this.context = -1;
+  this.frame_size = {w: -1, h: -1};
+  this.keybuffer = -1;
+  this.done = false;
+  this.blob = {
+    x_pos: 0,
+    y_pos: 0,
+    
+    // each object needs to handle drawing itself
+    draw: function(context_ptr){
+      context_ptr.fillStyle = "rgb(0, 0, 0)";
+      context_ptr.fillRect(this.x_pos-5, this.y_pos-5, 10, 10);
+    }
+  };
+  
+  // initialize the object. Set up stuff like the canvas and context and character parameters
+  // so that it can be dynamic on things like browser size in the future should 
+  // there be a need to make the canvas a dynamically sized.
+  this.init = function(canvas_id){
+    this.canvas = document.getElementById(canvas_id);
+    this.context = this.canvas.getContext('2d');
+    
+    this.frame_size.w = this.canvas.width;
+    this.frame_size.h = this.canvas.height;
+    
+    // set the starting position for the blob, and make sure we end up with a solid number
+    this.blob.x_pos = parseInt((this.frame_size.w/2).toFixed(0));
+    this.blob.y_pos = parseInt((this.frame_size.h/2).toFixed(0));
+    
+    // add the event listeners for the key up and key down
+    
+  },
+  
+  this.game_loop = function(){
+    console.log("context: "+this.context);
+    this.blob.draw(this.context);
+  },
+  this.handle_input = function(){
+  },
+  this.g_keyup = function(){},
+  this.g_keydown = function(){}
+}
+
+// Fill the keybuffer with the key that is being pressed
+window.onkeydown = function(){
+  
+}
+
+// Clear the keybuffer when the key is let up
+window.onkeyup = function(){
+  
+}
+
+window.onload = function(){
+  g = new Game();
+  g.init('canvas_a');
+  
+  // g.game_loop();
+  setInterval(g.game_loop(), 1000/60);
+}
+</script>
+</head>
+<body>
+  <canvas id='canvas_a' width='400px' height='300px'></canvas>
+</body>
+</html>
