@@ -38,6 +38,13 @@ function Game(){
     }
   };
   
+  // this is so we can retain scope when calling the keybinding methods
+  this.bind = function(scope, fn) {
+      return function () {
+          fn.apply(scope, arguments);
+      };
+  }
+  
   // initialize the object. Set up stuff like the canvas and context and character parameters
   // so that it can be dynamic on things like browser size in the future should 
   // there be a need to make the canvas a dynamically sized.
@@ -53,17 +60,31 @@ function Game(){
     this.blob.y_pos = parseInt((this.frame_size.h/2).toFixed(0));
     
     // add the event listeners for the key up and key down
-    
-  },
+    this.canvas.addEventListener("click", this.g_focus, false);
+    this.canvas.addEventListener("keydown", this.bind(this, this.g_keydown), false);
+    console.log('added listeners');
+  }
   
   this.game_loop = function(){
     console.log("context: "+this.context);
     this.blob.draw(this.context);
-  },
+  }
+
   this.handle_input = function(){
-  },
-  this.g_keyup = function(){},
-  this.g_keydown = function(){}
+  }
+  
+  this.g_keyup = function(key){}
+  
+  this.g_keydown = function(key){
+    console.log("key: "+key);
+    console.log("canvas: "+this.canvas);
+  }
+  
+  this.g_focus = function(e){
+    console.log("focus'd: "+e);
+
+  }
+
 }
 
 // Fill the keybuffer with the key that is being pressed
@@ -86,6 +107,6 @@ window.onload = function(){
 </script>
 </head>
 <body>
-  <canvas id='canvas_a' width='400px' height='300px'></canvas>
+  <canvas id='canvas_a' width='400px' height='300px' tabindex="1"></canvas>
 </body>
 </html>
