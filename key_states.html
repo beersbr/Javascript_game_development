@@ -15,11 +15,11 @@
 </style>
 
 <script>
-  // A quick reminder of key codes as returned by javascript
-  // w => 119
-  // a => 97
-  // s => 115
-  // d => 100
+  // A quick reminder of char codes as returned by javascript
+  // w => 87
+  // a => 65
+  // s => 83
+  // d => 68
 
 function Game(){
   this.canvas = -1;
@@ -60,31 +60,59 @@ function Game(){
     this.blob.y_pos = parseInt((this.frame_size.h/2).toFixed(0));
     
     // add the event listeners for the key up and key down
-    this.canvas.addEventListener("click", this.g_focus, false);
     this.canvas.addEventListener("keydown", this.bind(this, this.g_keydown), false);
+    this.canvas.addEventListener("keyup", this.bind(this, this.g_keyup), false);
     console.log('added listeners');
   }
   
   this.game_loop = function(){
-    console.log("context: "+this.context);
-    this.blob.draw(this.context);
+    // console.log("context: "+this.context);
+    
+    ret = this.handle_input();
+    console.log(ret);
+    
+    if(ret){
+      this.blob.draw(this.context);
+      console.log("blob: "+this.blob.x_pos);
+    }
   }
 
   this.handle_input = function(){
+    ret = false;
+    if(this.keybuffer == 87){ // w
+      this.blob.y_pos -= 1;
+      ret = true;
+    }
+    if(this.keybuffer == 83){ // s
+      this.blob.y_pos += 1;
+      ret = true;
+    }
+    if(this.keybuffer == 65){ // a
+      this.blob.x_pos -= 1;
+      ret = true;
+    }
+    if(this.keybuffer == 68){ // d
+      this.blob.x_pos += 1;
+      ret = true;
+    }
+    return ret;
   }
   
-  this.g_keyup = function(key){}
+  this.g_keyup = function(key){
+    if(key.keyCode == this.keybuffer){
+      this.keybuffer = -1;
+    }
+  }
   
   this.g_keydown = function(key){
-    console.log("key: "+key);
-    console.log("canvas: "+this.canvas);
+    if(this.keybuffer == -1){
+      this.keybuffer = key.keyCode
+    }
   }
   
   this.g_focus = function(e){
-    console.log("focus'd: "+e);
 
   }
-
 }
 
 // Fill the keybuffer with the key that is being pressed
@@ -101,8 +129,7 @@ window.onload = function(){
   g = new Game();
   g.init('canvas_a');
   
-  // g.game_loop();
-  setInterval(g.game_loop(), 1000/60);
+  setInterval(g.bind(g, g.game_loop), 1000/60);
 }
 </script>
 </head>
