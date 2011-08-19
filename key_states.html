@@ -21,7 +21,28 @@
   // s => 83
   // d => 68
 
+function KeyInput(){
+  this.keyStates = {}; // This will represent the keyboard and the button states of each key
+  
+  this.setKey = function(key_value){
+    // If we are setting the key for the first time make sure it has a value
+    if(this.keyStates[key_value] == null){
+      this.keyStates[key_value] = false;
+    }
+    
+    this.keyStates[key_value] = true;
+    console.log("setting: "+key_value+" => "+this.keyStates[key_value])
+  }
+  
+  this.unsetKey = function(key_value){
+    this.keyStates[key_value] = false;
+    console.log("setting: "+key_value+" => "+this.keyStates[key_value])
+  }
+}
+
 function Game(){
+  this.keyBuffer = new KeyInput();
+  this.g_interval = -1;
   this.canvas = -1;
   this.context = -1;
   this.frame_size = {w: -1, h: -1};
@@ -62,7 +83,6 @@ function Game(){
     // add the event listeners for the key up and key down
     this.canvas.addEventListener("keydown", this.bind(this, this.g_keydown), false);
     this.canvas.addEventListener("keyup", this.bind(this, this.g_keyup), false);
-    console.log('added listeners');
   }
   
   this.game_loop = function(){
@@ -73,63 +93,51 @@ function Game(){
     
     if(ret){
       this.blob.draw(this.context);
-      console.log("blob: "+this.blob.x_pos);
+      // console.log("blob: "+this.blob.x_pos);
     }
   }
 
+  // Handle the input from the keyboard ONE key at a time... need to fix this so it is smoother
   this.handle_input = function(){
     ret = false;
-    if(this.keybuffer == 87){ // w
+    if(this.keyBuffer.keyStates[87]){ // w
       this.blob.y_pos -= 1;
       ret = true;
     }
-    if(this.keybuffer == 83){ // s
+    if(this.keyBuffer.keyStates[83]){ // s
       this.blob.y_pos += 1;
       ret = true;
     }
-    if(this.keybuffer == 65){ // a
+    if(this.keyBuffer.keyStates[65]){ // a
       this.blob.x_pos -= 1;
       ret = true;
     }
-    if(this.keybuffer == 68){ // d
+    if(this.keyBuffer.keyStates[68]){ // d
       this.blob.x_pos += 1;
       ret = true;
+    }
+    if(this.keyBuffer[81]){
+      console.log(this.g_interval)
+      clearInterval(this.g_interval);
+      
     }
     return ret;
   }
   
   this.g_keyup = function(key){
-    if(key.keyCode == this.keybuffer){
-      this.keybuffer = -1;
-    }
+    this.keyBuffer.unsetKey(key.keyCode);
   }
   
   this.g_keydown = function(key){
-    if(this.keybuffer == -1){
-      this.keybuffer = key.keyCode
-    }
+    this.keyBuffer.setKey(key.keyCode);
   }
-  
-  this.g_focus = function(e){
-
-  }
-}
-
-// Fill the keybuffer with the key that is being pressed
-window.onkeydown = function(){
-  
-}
-
-// Clear the keybuffer when the key is let up
-window.onkeyup = function(){
-  
 }
 
 window.onload = function(){
   g = new Game();
   g.init('canvas_a');
   
-  setInterval(g.bind(g, g.game_loop), 1000/60);
+  g.g_interval = setInterval(g.bind(g, g.game_loop), 1000/60);
 }
 </script>
 </head>
