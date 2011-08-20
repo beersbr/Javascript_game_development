@@ -86,12 +86,11 @@ function Game(){
   }
   
   this.game_loop = function(){
-    // console.log("context: "+this.context);
-    
     ret = this.handle_input();
-    console.log(ret);
     
     if(ret){
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      
       this.blob.draw(this.context);
       // console.log("blob: "+this.blob.x_pos);
     }
@@ -116,7 +115,7 @@ function Game(){
       this.blob.x_pos += 1;
       ret = true;
     }
-    if(this.keyBuffer[81]){
+    if(this.keyBuffer.keyStates[81]){ // q
       console.log(this.g_interval)
       clearInterval(this.g_interval);
       

@@ -4,3 +4,7 @@ This is a repository for exploring and learning game development in javascript.
 A simple example of what a game loop might be in javascript.
 
 --- key_states.html ---
+A simple example of using asynchronous key states in javascript with canvas as the input.
+
+--- space_shooter.html ---
+The first game with the first part of the library in progress
