@@ -72,6 +72,14 @@ function Movable(){
   this.yPosition = null;
 }
 
+// Character inherets from movable
+Character.prototype = new Movable();
+Character.prototype.constructor = Character;
+
+function Character(){
+  
+}
+
 // This handles the images, there frames if it is an animation and any transformations
 function SpriteHandler(context, image_path){
   this.rotate = function(angle){
