@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Buffers</title>
+<title>Space Shooter</title>
 <style>
 body{
   display: block;
@@ -14,8 +14,8 @@ body{
 }
 </style>
 <script>
-// setup our objects for the game
-
+// This method lets us choose scope for functions so that when we use eventHandlers in javascript we 
+// retain the scope of our choosing inside that eventHandler callback.
 bind = function(scope, fn){
   return function(){
     fn.apply(scope, arguments);
@@ -25,7 +25,6 @@ bind = function(scope, fn){
 // This is the keyhandler on the window. You initalize it and grab the keys out of the keyHander#key(value);
 // keyHandler#key(value) will return a true or false value on wheather that key is pressed or not.
 function keyHandler(){
-  
   // sets the key in the buffer variable
   this.setKey = function(key){
     // If we are setting the key for the first time make sure it has a value
@@ -63,10 +62,55 @@ function keyHandler(){
   window.addEventListener("keyup", bind(this, this.unsetKey), false);
 }
 
+// This is the movalbe functionality
+function Movable(){
+  this.height = null;
+  this.width = null;
+  this.xVelocity = null;
+  this.yVelocity = null;
+  this.xPosition = null;
+  this.yPosition = null;
+}
 
+
+function SpriteHandler(context, image_path){
+  this.rotate = function(angle){
+    
+  }
+  
+  this.scale = function(x, y){
+    
+  }
+  
+  this.draw = function(at_x, at_y){
+    
+  }
+  
+  this.image_path = "";
+  this.image = null;
+  this.context = context;
+}
+
+function draw() {
+  var ctx = document.getElementById('canvas_a').getContext('2d');
+  ctx.translate(75,100);
+  
+  for (i=1;i<6;i++){
+    ctx.save();
+    ctx.fillStyle = 'rgb('+(51*i)+','+(255-51*i)+',255)';
+    for (j=0;j<i*6;j++){
+    // ctx.rotate(Math.PI*2/(i*6));
+    ctx.beginPath();
+    ctx.arc(0,i*12.5,5,0,Math.PI*2,true);
+    ctx.fill();
+    }
+    ctx.restore();
+  }
+}
 
 window.onload = function(){
-  var keybuffer = new keyHandler();
+  keybuffer = new keyHandler();
+  tets = true;
 }
 
 </script>
