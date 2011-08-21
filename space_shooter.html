@@ -85,6 +85,7 @@ function Character(){
 function SpriteHandler(context, image_path){
   this.rotate = function(angle){
     this.rot = angle;
+    this.direction += this.rot;
     return this.rot;
   }
   
@@ -94,33 +95,58 @@ function SpriteHandler(context, image_path){
   
   this.draw = function(at_x, at_y){
     this.context.save();
-    this.context.translate(at_x, at_y);
-    if(this.rot > 0){
-        this.context.rotate(parseInt(angle * Math.PI / 180));
-        this.rot = 0;
-    }
-    this.context.drawImage(this.image, at_x, at_y);
+    this.context.translate(at_x+(this.image.width/2), at_y+(this.image.height/2));
+    this.context.rotate(this.direction * Math.PI / 180);
+    this.rot = 0;
+    this.context.drawImage(this.image, -this.image.width/2, -this.image.height/2);
     this.context.restore();
+  }
+
+  this.dir = function(){
+    return this.direction - 90;
   }
 
   this.image = new Image();
   this.image.src = image_path;
   this.context = context;
-  this.direction = 90; // degrees
+  this.direction = 0; // degrees
   this.rot = 0;
 }
 
 function loop(){
+  if(keybuffer.key(65)){ // a
+    spt.rotate(-10);
+  }
+  if(keybuffer.key(83)){ // s
+    pos_x -= Math.cos(spt.dir() * Math.PI/180);
+    pos_y -= Math.sin(spt.dir() * Math.PI/180);
+  }
+  if(keybuffer.key(68)){ // d
+    spt.rotate(10);
+  }
+  if(keybuffer.key(87)){ // w
+    pos_x += Math.cos(spt.dir() * Math.PI/180);
+    pos_y += Math.sin(spt.dir() * Math.PI/180);
+  }
+  if(keybuffer.key(81)){
+    console.log('finished!');
+    clearInterval(l);
+  }
+  // clear the screen and draw
+  ctx.clearRect(0, 0, 400, 300);
+  spt.draw(pos_x, pos_y);
 }
 
 window.onload = function(){
   keybuffer = new keyHandler();
   
-  ctx = document.getElementById('canvas_a').getContext('2d');  
+  ctx = document.getElementById('canvas_a').getContext('2d');
   spt = new SpriteHandler(ctx, "images/spaceship.png");
   
+  pos_x = 100;
+  pos_y = 100;
   
-  
+  l = setInterval(loop, 1000/30);
   
 }
 
