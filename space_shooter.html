@@ -113,26 +113,31 @@ function SpriteHandler(context, image_path){
   this.rot = 0;
 }
 
+// This is the main game loop
 function loop(){
   if(keybuffer.key(65)){ // a
-    spt.rotate(-10);
+    spt.rotate(-5);
   }
   if(keybuffer.key(83)){ // s
-    pos_x -= Math.cos(spt.dir() * Math.PI/180);
-    pos_y -= Math.sin(spt.dir() * Math.PI/180);
+    acc -= 0.5;
   }
   if(keybuffer.key(68)){ // d
-    spt.rotate(10);
+    spt.rotate(5);
   }
   if(keybuffer.key(87)){ // w
-    pos_x += Math.cos(spt.dir() * Math.PI/180);
-    pos_y += Math.sin(spt.dir() * Math.PI/180);
+    acc += 0.5;
   }
   if(keybuffer.key(81)){
     console.log('finished!');
     clearInterval(l);
   }
   // clear the screen and draw
+  
+  pos_x += Math.cos(spt.dir() * Math.PI/180) * acc;
+  pos_y += Math.sin(spt.dir() * Math.PI/180) * acc;
+  
+  acc *= friction;
+  
   ctx.clearRect(0, 0, 400, 300);
   spt.draw(pos_x, pos_y);
 }
@@ -143,10 +148,14 @@ window.onload = function(){
   ctx = document.getElementById('canvas_a').getContext('2d');
   spt = new SpriteHandler(ctx, "images/spaceship.png");
   
+  speed = 2;
+  friction = 0.88;
+  acc = 0;
+  
   pos_x = 100;
   pos_y = 100;
   
-  l = setInterval(loop, 1000/30);
+  l = setInterval(loop, 1000/60);
   
 }
 
