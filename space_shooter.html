@@ -64,12 +64,13 @@ function keyHandler(){
 
 // This is the movalbe functionality
 function Movable(){
-  this.height = null;
-  this.width = null;
-  this.xVelocity = null;
-  this.yVelocity = null;
-  this.xPosition = null;
-  this.yPosition = null;
+  this.h = null;
+  this.w = null;
+  this.xVel = null;
+  this.yVel = null;
+  this.x = null;
+  this.y = null;
+  this.direction = 90; // this is in degrees [deg = rad * PI / 180]
 }
 
 // Character inherets from movable
@@ -82,12 +83,9 @@ function Character(){
 
 // This handles the images, there frames if it is an animation and any transformations
 function SpriteHandler(context, image_path){
-  this.rotate = function(angle, at_x, at_y){
-	this.context.save();
-	this.context.rotate(parseInt(angle * Math.PI / 180));
-	this.context.drawImage(this.image, at_x, at_y);
-	this.context.restore();
-	
+  this.rotate = function(angle){
+    this.rot = angle;
+    return this.rot;
   }
   
   this.scale = function(x, y){
@@ -95,12 +93,21 @@ function SpriteHandler(context, image_path){
   }
   
   this.draw = function(at_x, at_y){
+    this.context.save();
+    this.context.translate(at_x, at_y);
+    if(this.rot > 0){
+        this.context.rotate(parseInt(angle * Math.PI / 180));
+        this.rot = 0;
+    }
     this.context.drawImage(this.image, at_x, at_y);
+    this.context.restore();
   }
 
   this.image = new Image();
   this.image.src = image_path;
   this.context = context;
+  this.direction = 90; // degrees
+  this.rot = 0;
 }
 
 function loop(){
