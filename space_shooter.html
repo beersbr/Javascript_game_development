@@ -31,8 +31,8 @@ function pythag(d1, d2){
 
 function particle(x, y, context, color_r, color_g, color_b, direction, speed){
   this.update = function(){
-    ctx.fillStyle = "rgb("+this.r+","+this.g+","+this.b+")";
-    ctx.fillRect(this.x-1, this.y-1, 2, 2);
+    ctx.fillStyle = "rgba("+this.r+","+this.g+","+this.b+", "+0.6+")";
+    ctx.fillRect(this.x-2, this.y-2, 4, 4);
     
     this.delta_x = Math.cos(this.direction * (Math.PI/180)) * this.speed;
     this.delta_y = Math.sin(this.direction * (Math.PI/180)) * this.speed;
@@ -72,7 +72,7 @@ function particleFountain(sx, sy, context, cnt, speed, color_r, color_g, color_b
   this.start = function(){
     for(var i = 0; i < this.count; i++){
       var color_mod = random(150);
-      this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-10+random(20), this.speed*random(2)+1))
+      this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-30+random(60), this.speed*random(2)+1))
     }
   }
   
@@ -81,13 +81,10 @@ function particleFountain(sx, sy, context, cnt, speed, color_r, color_g, color_b
       if(this.particles[i].update()){
         var color_mod = random(150);
         this.particles.splice(i, 1);
-        this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-10+random(20), this.speed*random(2)+1) );
+        this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-30+random(60), this.speed*random(2)+1) );
+
       };
     }
-  }
-  
-  this.stop = function(){
-    
   }
   
   this.direction = direction; // degrees
@@ -99,9 +96,7 @@ function particleFountain(sx, sy, context, cnt, speed, color_r, color_g, color_b
   this.g = color_g;
   this.b = color_b;
   this.particles = [];
-  
   this.ctx = context;
-  
 }
 
 // This handles the images, there frames if it is an animation and any transformations
@@ -125,7 +120,7 @@ function SpriteHandler(context, image_path){
     this.context.restore();
   }
 
-  this.dir = function(){
+  this.get_dir = function(){
     return this.direction - 90;
   }
 
@@ -155,8 +150,8 @@ function loop(){
     clearInterval(l);
   }
   
-  pos_x += Math.cos(spt.dir() * Math.PI/180) * acc;
-  pos_y += Math.sin(spt.dir() * Math.PI/180) * acc;
+  pos_x += Math.cos(spt.get_dir() * Math.PI/180) * acc;
+  pos_y += Math.sin(spt.get_dir() * Math.PI/180) * acc;
   acc *= friction;
   
   // fix the ships position so he can't leave the screen
@@ -175,7 +170,7 @@ window.onload = function(){
   ctx = document.getElementById('canvas_a').getContext('2d');
   spt = new SpriteHandler(ctx, "images/spaceship.png");
   
-  f = new particleFountain(200, 200, ctx, 10, 1, 50, 0, 0, ~45+180);
+  f = new particleFountain(200, 200, ctx, 20, 1, 50, 0, 0, ~45+180);
   f.start();
   
   speed = 2;
