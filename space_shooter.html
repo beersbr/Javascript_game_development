@@ -6,81 +6,17 @@ body{
   display: block;
 }
 #canvas_a{
-  width: 400px;
-  height: 300px;
+  width: 640px;
+  height: 480px;
   border: 3px solid #000000;
   display: block;
   margin: auto;
 }
 </style>
+
+<script src='game_common.js'></script>
+
 <script>
-// This method lets us choose scope for functions so that when we use eventHandlers in javascript we 
-// retain the scope of our choosing inside that eventHandler callback.
-bind = function(scope, fn){
-  return function(){
-    fn.apply(scope, arguments);
-  };
-}
-
-// This is the keyhandler on the window. You initalize it and grab the keys out of the keyHander#key(value);
-// keyHandler#key(value) will return a true or false value on wheather that key is pressed or not.
-function keyHandler(){
-  // sets the key in the buffer variable
-  this.setKey = function(key){
-    // If we are setting the key for the first time make sure it has a value
-    if(this.keyStates[key.keyCode] == null){
-      this.keyStates[key.keyCode] = false;
-    }
-    this.keyStates[key.keyCode] = true;
-    
-    if(this.debug){
-      console.log("KEY: "+key.keyCode+" => "+this.keyStates[key.keyCode]);
-    }
-  }
-
-  // unsets the key in the buffer variable
-  this.unsetKey = function(key){
-    this.keyStates[key.keyCode] = false;
-    
-    if(this.debug){
-      console.log("KEY: "+key.keyCode+" => "+this.keyStates[key.keyCode]);
-    }
-  }
-  
-  // This is just a getter to make the later syntax easier to read through
-  this.key = function(key_value){
-    if(this.keyStates[key_value]){
-      return true;
-    }
-    return false;
-  }
-
-  // the 'constructor' values
-  this.debug = false;
-  this.keyStates = {};
-  window.addEventListener("keydown", bind(this, this.setKey), false);
-  window.addEventListener("keyup", bind(this, this.unsetKey), false);
-}
-
-// This is the movalbe functionality
-function Movable(){
-  this.h = null;
-  this.w = null;
-  this.xVel = null;
-  this.yVel = null;
-  this.x = null;
-  this.y = null;
-  this.direction = 90; // this is in degrees [deg = rad * PI / 180]
-}
-
-// Character inherets from movable
-Character.prototype = new Movable();
-Character.prototype.constructor = Character;
-
-function Character(){
-  
-}
-
 // This handles the images, there frames if it is an animation and any transformations
 function SpriteHandler(context, image_path){
   this.rotate = function(angle){
@@ -138,7 +74,7 @@ function loop(){
   
   acc *= friction;
   
-  ctx.clearRect(0, 0, 400, 300);
+  ctx.clearRect(0, 0, 640, 480);
   spt.draw(pos_x, pos_y);
 }
 
@@ -162,6 +98,6 @@ window.onload = function(){
 </script>
 </head>
 <body>
-  <canvas id='canvas_a' width='400px' height='300px'></canvas>
+  <canvas id='canvas_a' width='640px' height='480px'></canvas>
 </body>
 </html>
