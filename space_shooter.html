@@ -20,6 +20,7 @@ body{
 function particle(x, y, context, color_r, color_g, color_b, direction, speed){
   this.update = function(){
     ctx.fillStyle = "rgba("+this.r+","+this.g+","+this.b+", "+0.6+")";
+    // ctx.fillRect(Math.round(this.x)-2, Math.round(this.y)-2, 4, 4);
     ctx.fillRect(this.x-2, this.y-2, 4, 4);
     
     this.delta_x = Math.cos(this.direction * (Math.PI/180)) * this.speed;
@@ -76,6 +77,22 @@ function particleFountain(sx, sy, context, cnt, speed, color_r, color_g, color_b
     }
   }
   
+  this.update_ex = function(params){
+    var cust_dir = params.direction || this.direction;
+    var cust_x = params.x || this.x;
+    var cust_y = params.y || this.y;
+    var cust_create = params.create;
+    
+    for(var i = 0; i < this.count; i++){
+      
+      if(this.particles[i].update()){
+        this.particles.splice(i, 1);
+        var color_mod = random(150);
+        this.particles.push(new particle(cust_x, cust_y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, cust_dir-30+random(60), this.speed*random(2)+1) );
+      };
+    }
+  }
+  
   this.direction = direction; // degrees
   this.x = sx;
   this.y = sy;
@@ -108,11 +125,11 @@ function SpriteHandler(context, image_path){
     this.context.drawImage(this.image, -this.image.width/2, -this.image.height/2);
     this.context.restore();
   }
-
+  
   this.get_dir = function(){
     return this.direction - 90;
   }
-
+  
   this.image = new Image();
   this.image.src = image_path;
   this.context = context;
@@ -149,17 +166,25 @@ function loop(){
   
   // clear the screen and draw
   ctx.clearRect(0, 0, 640, 480);
+  
+  f.update_ex({"direction": spt.get_dir()+180, "x": pos_x % 640 + spt.image.width/2, "y": pos_y % 480 + spt.image.height/2});
   spt.draw(pos_x % 640, pos_y % 480);
-  f.update();
+  fps++;
+}
+
+function check_fps(){
+  console.log("fps: "+fps);
+  fps = 0;
 }
 
 window.onload = function(){
+  fps = 0;
   keybuffer = new keyHandler();
   
   ctx = document.getElementById('canvas_a').getContext('2d');
   spt = new SpriteHandler(ctx, "images/spaceship.png");
   
-  f = new particleFountain(200, 200, ctx, 20, 1, 50, 0, 0, ~45+180);
+  f = new particleFountain(spt.x, spt.y, ctx, 200, 1, 100, 30, 0, spt.get_dir());
   f.start();
   
   speed = 2;
@@ -170,6 +195,7 @@ window.onload = function(){
   pos_y = 100;
   
   l = setInterval(loop, 1000/60);
+  // s = setInterval(check_fps, 1000);
 }
 
 </script>
