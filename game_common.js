@@ -1,3 +1,17 @@
+// These are a bunch of helper functions that are basically one liners for making other parts
+// of the code more readable
+function TimeSeconds(){
+  return Date.now()/1000;
+};
+
+function random(max){
+  return Math.floor(Math.random()*max+1);
+}
+
+function pythag(d1, d2){
+  return parseInt(Math.sqrt(Math.pow(d1, 2) + Math.pow(d2, 2)));
+}
+
 // This method lets us choose scope for functions so that when we use eventHandlers in javascript we 
 // retain the scope of our choosing inside that eventHandler callback.
 bind = function(scope, fn){

@@ -17,18 +17,6 @@ body{
 <script src='game_common.js'></script>
 
 <script>
-function TimeSeconds(){
-  return Date.now()/1000;
-};
-
-function random(max){
-  return Math.floor(Math.random()*max+1);
-}
-
-function pythag(d1, d2){
-  return parseInt(Math.sqrt(Math.pow(d1, 2) + Math.pow(d2, 2)));
-}
-
 function particle(x, y, context, color_r, color_g, color_b, direction, speed){
   this.update = function(){
     ctx.fillStyle = "rgba("+this.r+","+this.g+","+this.b+", "+0.6+")";
@@ -68,6 +56,7 @@ function particle(x, y, context, color_r, color_g, color_b, direction, speed){
   this.ctx = context;
 }
 
+// TODO: add code for dynamic placement and movement of the actual fountain
 function particleFountain(sx, sy, context, cnt, speed, color_r, color_g, color_b, direction){
   this.start = function(){
     for(var i = 0; i < this.count; i++){
