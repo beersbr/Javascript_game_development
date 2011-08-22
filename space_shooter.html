@@ -17,6 +17,93 @@ body{
 <script src='game_common.js'></script>
 
 <script>
+function TimeSeconds(){
+  return Date.now()/1000;
+};
+
+function random(max){
+  return Math.floor(Math.random()*max+1);
+}
+
+function pythag(d1, d2){
+  return parseInt(Math.sqrt(Math.pow(d1, 2) + Math.pow(d2, 2)));
+}
+
+function particle(x, y, context, color_r, color_g, color_b, direction, speed){
+  this.update = function(){
+    ctx.fillStyle = "rgb("+this.r+","+this.g+","+this.b+")";
+    ctx.fillRect(this.x-1, this.y-1, 2, 2);
+    
+    this.delta_x = Math.cos(this.direction * (Math.PI/180)) * this.speed;
+    this.delta_y = Math.sin(this.direction * (Math.PI/180)) * this.speed;
+    
+    this.x += this.delta_x;
+    this.y += this.delta_y;
+    
+    this.travel += pythag(this.delta_x, this.delta_y);
+    
+    if(this.travel > this.max_dist){
+      return true;
+    }
+    return false;
+  }
+  
+  this.created_at = TimeSeconds();
+  
+  this.delta_x = 0;
+  this.delta_y = 0;
+  
+  this.travel = 0;
+  this.max_dist = 20+random(50);
+  
+  this.r = color_r;
+  this.g = color_g;
+  this.b = color_b;
+  
+  this.speed = speed
+  this.direction = direction;
+  this.x = x;
+  this.y = y;
+  this.speed = speed;
+  this.ctx = context;
+}
+
+function particleFountain(sx, sy, context, cnt, speed, color_r, color_g, color_b, direction){
+  this.start = function(){
+    for(var i = 0; i < this.count; i++){
+      var color_mod = random(150);
+      this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-10+random(20), this.speed*random(2)+1))
+    }
+  }
+  
+  this.update = function(){
+    for(var i = 0; i < this.count; i++){
+      if(this.particles[i].update()){
+        var color_mod = random(150);
+        this.particles.splice(i, 1);
+        this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-10+random(20), this.speed*random(2)+1) );
+      };
+    }
+  }
+  
+  this.stop = function(){
+    
+  }
+  
+  this.direction = direction; // degrees
+  this.x = sx;
+  this.y = sy;
+  this.count = cnt;
+  this.speed = speed; // this will be ~randomized
+  this.r = color_r;
+  this.g = color_g;
+  this.b = color_b;
+  this.particles = [];
+  
+  this.ctx = context;
+  
+}
+
 // This handles the images, there frames if it is an animation and any transformations
 function SpriteHandler(context, image_path){
   this.rotate = function(angle){
@@ -67,15 +154,19 @@ function loop(){
     console.log('finished!');
     clearInterval(l);
   }
-  // clear the screen and draw
   
   pos_x += Math.cos(spt.dir() * Math.PI/180) * acc;
   pos_y += Math.sin(spt.dir() * Math.PI/180) * acc;
-  
   acc *= friction;
   
+  // fix the ships position so he can't leave the screen
+  if(pos_x+spt.image.width/2 < 0) pos_x = 640 + pos_x;
+  if(pos_y+spt.image.height/2 < 0) pos_y = 480 + pos_y;
+  
+  // clear the screen and draw
   ctx.clearRect(0, 0, 640, 480);
-  spt.draw(pos_x, pos_y);
+  spt.draw(pos_x % 640, pos_y % 480);
+  f.update();
 }
 
 window.onload = function(){
@@ -84,15 +175,17 @@ window.onload = function(){
   ctx = document.getElementById('canvas_a').getContext('2d');
   spt = new SpriteHandler(ctx, "images/spaceship.png");
   
+  f = new particleFountain(200, 200, ctx, 10, 1, 50, 0, 0, ~45+180);
+  f.start();
+  
   speed = 2;
-  friction = 0.88;
+  friction = 0.93;
   acc = 0;
   
   pos_x = 100;
   pos_y = 100;
   
   l = setInterval(loop, 1000/60);
-  
 }
 
 </script>
