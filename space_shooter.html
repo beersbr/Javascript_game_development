@@ -15,126 +15,58 @@ body{
 </style>
 
 <script src='game_common.js'></script>
+<script src='underscore.js'></script>
 
 <script>
-function particle(x, y, context, color_r, color_g, color_b, direction, speed){
-  this.update = function(){
-    ctx.fillStyle = "rgba("+this.r+","+this.g+","+this.b+", "+0.6+")";
-    // ctx.fillRect(Math.round(this.x)-2, Math.round(this.y)-2, 4, 4);
-    ctx.fillRect(this.x-2, this.y-2, 4, 4);
+function Entity(context, at_x, at_y, direction, speed, distance){
+  
+  this.draw = function(){
+    this.x += this.deltaX;
+    this.y += this.deltaY;
     
-    this.delta_x = Math.cos(this.direction * (Math.PI/180)) * this.speed;
-    this.delta_y = Math.sin(this.direction * (Math.PI/180)) * this.speed;
+    this.ctx.fillStyle = "rgb(0, 0, 0)";
+    this.ctx.fillRect(this.x - 3, this.y - 3, 6, 6);
     
-    this.x += this.delta_x;
-    this.y += this.delta_y;
+    this.travel += this.travel_at;
+    if(this.travel > this.max_distance) return false;
     
-    this.travel += pythag(this.delta_x, this.delta_y);
-    
-    if(this.travel > this.max_dist){
-      return true;
-    }
-    return false;
+    return true;
   }
   
-  this.created_at = TimeSeconds();
-  
-  this.delta_x = 0;
-  this.delta_y = 0;
-  
+  this.max_distance = distance;
   this.travel = 0;
-  this.max_dist = 20+random(50);
-  
-  this.r = color_r;
-  this.g = color_g;
-  this.b = color_b;
-  
-  this.speed = speed
-  this.direction = direction;
-  this.x = x;
-  this.y = y;
-  this.speed = speed;
-  this.ctx = context;
-}
-
-// TODO: add code for dynamic placement and movement of the actual fountain
-function particleFountain(sx, sy, context, cnt, speed, color_r, color_g, color_b, direction){
-  this.start = function(){
-    for(var i = 0; i < this.count; i++){
-      var color_mod = random(150);
-      this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-30+random(60), this.speed*random(2)+1))
-    }
-  }
-  
-  this.update = function(){
-    for(var i = 0; i < this.count; i++){
-      if(this.particles[i].update()){
-        var color_mod = random(150);
-        this.particles.splice(i, 1);
-        this.particles.push(new particle(this.x, this.y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, this.direction-30+random(60), this.speed*random(2)+1) );
-
-      };
-    }
-  }
-  
-  this.update_ex = function(params){
-    var cust_dir = params.direction || this.direction;
-    var cust_x = params.x || this.x;
-    var cust_y = params.y || this.y;
-    var cust_create = params.create;
-    
-    for(var i = 0; i < this.count; i++){
-      
-      if(this.particles[i].update()){
-        this.particles.splice(i, 1);
-        var color_mod = random(150);
-        this.particles.push(new particle(cust_x, cust_y, this.ctx, this.r+color_mod, this.g+color_mod/2, this.b+color_mod/2, cust_dir-30+random(60), this.speed*random(2)+1) );
-      };
-    }
-  }
-  
+  this.speed = 0;
   this.direction = direction; // degrees
-  this.x = sx;
-  this.y = sy;
-  this.count = cnt;
-  this.speed = speed; // this will be ~randomized
-  this.r = color_r;
-  this.g = color_g;
-  this.b = color_b;
-  this.particles = [];
+  this.accX = 0.0;
+  this.accY = 0.0;
+  this.deltaX = Math.cos(this.direction * Math.PI/180)*speed;
+  this.deltaY = Math.sin(this.direction * Math.PI/180)*speed;
+  this.travel_at = Math.sqrt(Math.pow(this.deltaX, 2) + Math.pow(this.deltaY, 2));
+  
+  this.x = at_x;
+  this.y = at_y;
   this.ctx = context;
 }
 
-// This handles the images, there frames if it is an animation and any transformations
-function SpriteHandler(context, image_path){
-  this.rotate = function(angle){
-    this.rot = angle;
-    this.direction += this.rot;
-    return this.rot;
+function Bullets(context){
+  this.add_bullet = function(at_x, at_y, direction, speed, distance){
+    if(this.tick_count % this.add_tick == 0){
+      this.bullets.push(new Entity(this.ctx, at_x, at_y, direction, speed, distance));
+    }
   }
   
-  this.scale = function(x, y){
-    
+  this.draw = function(){
+    for(var i = 0; i < this.bullets.length; i++){
+      if(!this.bullets[i].draw()){
+        this.bullets.splice(i, 1);
+      }
+    }
   }
   
-  this.draw = function(at_x, at_y){
-    this.context.save();
-    this.context.translate(at_x+(this.image.width/2), at_y+(this.image.height/2));
-    this.context.rotate(this.direction * Math.PI / 180);
-    this.rot = 0;
-    this.context.drawImage(this.image, -this.image.width/2, -this.image.height/2);
-    this.context.restore();
-  }
-  
-  this.get_dir = function(){
-    return this.direction - 90;
-  }
-  
-  this.image = new Image();
-  this.image.src = image_path;
-  this.context = context;
-  this.direction = 0; // degrees
-  this.rot = 0;
+  this.tick_count = 0;
+  this.add_tick = 7; // every 5 frames
+  this.ctx = context;
+  this.bullets = [];
 }
 
 // This is the main game loop
@@ -151,6 +83,9 @@ function loop(){
   if(keybuffer.key(87)){ // w
     acc += 0.5;
   }
+  if(keybuffer.key(76)){
+    b.add_bullet(pos_x + spt.image.width/2, pos_y + spt.image.height/2, spt.get_dir(), 10, 500);
+  }
   if(keybuffer.key(81)){
     console.log('finished!');
     clearInterval(l);
@@ -164,11 +99,16 @@ function loop(){
   if(pos_x+spt.image.width/2 < 0) pos_x = 640 + pos_x;
   if(pos_y+spt.image.height/2 < 0) pos_y = 480 + pos_y;
   
+  pos_x = pos_x % 640;
+  pos_y = pos_y % 480;
+  
   // clear the screen and draw
   ctx.clearRect(0, 0, 640, 480);
   
-  f.update_ex({"direction": spt.get_dir()+180, "x": pos_x % 640 + spt.image.width/2, "y": pos_y % 480 + spt.image.height/2});
-  spt.draw(pos_x % 640, pos_y % 480);
+  f.update_ex({"direction": spt.get_dir()+180, "x": pos_x + spt.image.width/2, "y": pos_y + spt.image.height/2});
+  spt.draw(pos_x, pos_y);
+  b.draw();
+  b.tick_count += 1;
   fps++;
 }
 
@@ -184,8 +124,10 @@ window.onload = function(){
   ctx = document.getElementById('canvas_a').getContext('2d');
   spt = new SpriteHandler(ctx, "images/spaceship.png");
   
-  f = new particleFountain(spt.x, spt.y, ctx, 200, 1, 100, 30, 0, spt.get_dir());
+  f = new particleFountain(spt.x, spt.y, ctx, 80, 1, 100, 30, 0, spt.get_dir());
   f.start();
+  
+  b = new Bullets(ctx);
   
   speed = 2;
   friction = 0.93;
@@ -195,6 +137,7 @@ window.onload = function(){
   pos_y = 100;
   
   l = setInterval(loop, 1000/60);
+    
   // s = setInterval(check_fps, 1000);
 }
 
