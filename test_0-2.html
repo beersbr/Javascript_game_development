@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<style>
+	#acanvas{
+		border: 3px solid black;
+		width: 640px;
+		height: 480px;
+	}
+
+	.off{ 
+		background: #ff4444;
+	}
+
+	.on{
+		background: #55ff66;
+	}
+</style>
+<title>games_common_v0.2.js</title>
+<script type='text/javascript' src='./javascripts/games_common_v0.2.js'></script>
+<script>
+window.onload = function(){
+	var canvas = document.getElementById('acanvas');
+	var ctx = canvas.getContext('2d');
+
+
+	// PARTICLES
+	// -----------------------------------------------------------------------------------------------
+	var particle_toggle = false;
+	var particle_button = document.getElementById('particles');
+	particle_button.addEventListener("click", function(){
+
+		if(this.className == 'off'){ 
+			particle_toggle = start_particles();
+			this.className = 'on';
+		}else{
+			this.className = 'off'
+			clearInterval(particle_toggle);
+			ctx.clearRect(0, 0, 640, 480);
+		}
+	});
+
+	function start_particles(){
+		var p = new ParticleFountain({'x': 320, 'y': 480,  'direction': -90, 'count': 150, 'speed': 5, 'context': ctx});
+
+
+		var s = setInterval(function(){
+					ctx.clearRect(0, 0, 640, 480);
+					p.update();
+							}, 1000/60);
+		return s;
+	}
+
+
+	// ENTITY AND COLLISION
+	// -----------------------------------------------------------------------------------------------
+	var collision_toggle = false;	
+	var collision_button = document.getElementById('collision');
+
+	
+	
+}
+</script>
+</head>
+<body>
+	<div>
+		<button id='particles' class='off' value='particles' name='particles'>Particles</button>
+		<button id='collision' class='off' value='collision' name='collision'>Collision</button>
+	</div>
+	<canvas id='acanvas' height='480px' width='640px'></canvas>
+</body>
+</html>
