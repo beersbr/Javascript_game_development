@@ -116,41 +116,6 @@ function SpriteHandler(){
   this.rot = 0;
 }
 
-//-----------------------------------------------------------------------------------
-// ENTITY: Entity is the base object for all our movable objects
-//-----------------------------------------------------------------------------------
-function Entity(init){
-  this.inheritFrom = SpriteHandler;
-  this.inheritFrom(init.context, init.sprite_path);
-  
-  this.isCollidingWith = function(x2, y2, w1, h1){
-    x1 = this.x + this.width;
-    y1 = this.y + this.height;
-    x3 = x2 + w1;
-    y3 = y2 + h1;
-    return !(x1<x2 || x3<this.x || y1<y2 || y3<this.y);
-  }
-
-  // These functions must be here so that they always exist in the child objects
-  this.update = function(){}
-  
-  get_id = function(){
-    if(typeof Entity.ids == 'undefined') Entity.ids = 0;
-    return Entity.ids++;
-  }
-  
-  this.id = get_id();
-  
-  this.width = init.width || 0;
-  this.height = init.height || 0;
-  this.x = init.x || 0;
-  this.y = init.y || 0;
-  this.ax = init.ax || 0; // the acceleration
-  this.ay = init.ay || 0;
-  this.context = init.context;
-  this.sprite_path = init.sprite_path
-}
-
 
 //-----------------------------------------------------------------------------------
 // PARTICLE: A simple particle object for fun particle systems
@@ -345,6 +310,43 @@ function CollisionMap(width, height){
   this.map_size = 0;
   this.map = []
 }
+
+
+//-----------------------------------------------------------------------------------
+// ENTITY: Entity is the base object for all our movable objects
+//-----------------------------------------------------------------------------------
+function Entity(init){
+  this.inheritFrom = SpriteHandler;
+  this.inheritFrom(init.context, init.sprite_path);
+  
+  this.isCollidingWith = function(x2, y2, w1, h1){
+    x1 = this.x + this.width;
+    y1 = this.y + this.height;
+    x3 = x2 + w1;
+    y3 = y2 + h1;
+    return !(x1<x2 || x3<this.x || y1<y2 || y3<this.y);
+  }
+
+  // These functions must be here so that they always exist in the child objects
+  this.update = function(){}
+  
+  get_id = function(){
+    if(typeof Entity.ids == 'undefined') Entity.ids = 0;
+    return Entity.ids++;
+  }
+  
+  this.id = get_id();
+  
+  this.width = init.width || 0;
+  this.height = init.height || 0;
+  this.x = init.x || 0;
+  this.y = init.y || 0;
+  this.ax = init.ax || 0; // the acceleration
+  this.ay = init.ay || 0;
+  this.context = init.context;
+  this.sprite_path = init.sprite_path
+}
+
 
 //-----------------------------------------------------------------------------------
 // ENTITYLIST: EntityList is a list of entities. It will batch your entity stuff together
