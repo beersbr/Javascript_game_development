@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>DrawMe POC</title>
+<style>
+body{
+  display: block;
+}
+#wrapper{
+  border: 3px solid #000000;
+  width: 760px;
+  margin: auto;
+}
+#canvas{
+  width: 450px;
+  height: 400px;
+  border: 3px solid #000000;
+  display: block;
+/*  margin: auto;*/
+  float: right;
+}
+
+.clr{
+  clear: both;
+}
+</style>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
+<script>
+
+// draw a grid on the canvas of a given size
+// accepts a canvas id name and the desired width and height of the image
+
+function mouseHandler(context_id){
+  
+}
+
+function draw_grid(canvas, res_x, res_y){
+  
+  this.update = function(){
+    console.log("context: "+this.ctx);
+    this.ctx.strokeStyle = "rgb(0, 0, 0)";
+    this.ctx.fillStyle = "rgb(0, 0, 0)";
+    this.ctx.lineWidth = 1;
+    
+    for(var i = 0; i < this.res_x; i++){
+      this.ctx.moveTo(i*this.cell_size_x, 0);
+      this.ctx.lineTo(i*this.cell_size_x, this.height);
+    }
+
+    for(var i = 0; i < this.res_y; i++){
+      this.ctx.moveTo(0, i*this.cell_size_y);
+      this.ctx.lineTo(this.width, i*this.cell_size_y);
+    }
+    
+    this.ctx.stroke();
+    console.log("drw'd");
+  }
+  
+  // TODO: only need one call for the document.get ...
+  this.ctx = document.getElementById(canvas).getContext('2d');
+  this.width = document.getElementById(canvas).width
+  this.height = document.getElementById(canvas).height
+  console.log(this.width+", "+this.height);
+  this.res_x = res_x;
+  this.res_y = res_y;
+  this.grid = [];
+  this.cell_size_x = this.width/this.res_x;
+  this.cell_size_y = this.height/this.res_y;
+  
+  console.log(this.cell_size_x+", "+this.cell_size_y);
+  
+  // create the double array for ease of cell access later on
+  for(var y = 0; y < this.res_y; y++){
+    this.grid[y] = [];
+  }
+}
+
+$(document).ready(function(){
+  // get the canvas and context
+  canvas = document.getElementById("canvas");
+  context = canvas.getContext('2d');
+  
+  grid = new draw_grid('canvas', 40, 40);
+  
+})
+</script>
+</head>
+<body>
+  <div id='wrapper'>
+    <table width="100%">
+      <tr>
+        <td>box1</td>
+        <td id="canvas-cell" rowspan="2">
+          <canvas id='canvas' width='500px' height='500px'></canvas>
+          <div class='clr'></div>
+        </td>
+      </tr>
+      <tr>
+        <td>box2</td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

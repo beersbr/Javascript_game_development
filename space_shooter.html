@@ -20,6 +20,11 @@ body{
 <script>
 function Entity(context, at_x, at_y, direction, speed, distance){
   
+  // dist_fn must accept an x and y for comparison
+  this.collides_with_circle = function(x, y, r){
+    return (Math.sqrt(Math.pow(x - this.x, 2) +  Math.pow(y - this.y, 2)) < r);
+  }
+  
   this.draw = function(){
     this.x += this.deltaX;
     this.y += this.deltaY;
@@ -46,6 +51,7 @@ function Entity(context, at_x, at_y, direction, speed, distance){
   this.x = at_x;
   this.y = at_y;
   this.ctx = context;
+  this.owner = 0;
 }
 
 function Bullets(context){
@@ -57,6 +63,7 @@ function Bullets(context){
   
   this.draw = function(){
     for(var i = 0; i < this.bullets.length; i++){
+      this.collision = this.bullets[i].collides_with_circle(pos_x, pos_y, 15);
       if(!this.bullets[i].draw()){
         this.bullets.splice(i, 1);
       }
@@ -67,6 +74,7 @@ function Bullets(context){
   this.add_tick = 7; // every 5 frames
   this.ctx = context;
   this.bullets = [];
+  this.collision = false;
 }
 
 // This is the main game loop
