@@ -26,8 +26,13 @@ function timeSeconds(){
 }
 
 // Returns a random number between 0 and max
-function random(max){
+function randomInt(max){
   return Math.floor(Math.random()*max+1);
+}
+
+// Returns a random number between 0 and max where the return is not guaranteed to be an integer.
+function randomFloat(max){
+  return Math.random()*max+1;
 }
 
 // Returns the distance between 2 points d1 and d2. The number is returned as an INTEGER for speed in use.
@@ -121,16 +126,16 @@ function SpriteHandler(){
 // PARTICLE: A simple particle object for fun particle systems
 //-----------------------------------------------------------------------------------
 function Particle(params){
+
   this.update = function(){
     // These only get calculated once
-    if(this.dx == null) this.dx = Math.cos(this.direction * (Math.PI/180)) * this.speed;
-    if(this.dy == null) this.dy = Math.sin(this.direction * (Math.PI/180)) * this.speed;
+    if(this.dx == null) this.dx = Math.cos(this.direction * (Math.PI/180));
+    if(this.dy == null) this.dy = Math.sin(this.direction * (Math.PI/180));
 
-    this.x += this.dx;
-    this.y += this.dy;
-    this.ttl--;
+    this.x += this.dx * this.speed;
+    this.y += this.dy * this.speed;
 
-    if(this.ttl > 0) return false;
+    if(--this.ttl > 0) return false;
     return true;
   }
   
@@ -144,14 +149,14 @@ function Particle(params){
   this.dx = null;
   this.dy = null;
   
-  this.ttl = params.ttl || 10+random(30); // How many frames does this particle live for
+  this.ttl = params.ttl || 10+randomInt(30); // How many frames does this particle live for
 
   this.r = params.red || 0;
   this.g = params.green || 0;
   this.b = params.blue || 0;
   this.x = params.x || 0;
   this.y = params.y || 0;
-  this.speed = params.speed || 0;
+  this.speed = params.speed || 1;
   this.direction = params.direction || 0;
   this.context = params.context || 0;
 }
@@ -169,9 +174,9 @@ function ParticleFountain(params){
                                           'red': this.r+150,
                                           'green': this.g+150/2,
                                           'blue': this.b+150/2,
-                                          'direction': this.direction-40+random(80),
-                                          'speed': this.speed*random(1)+1,
-                                          'ttl': random(10)+20
+                                          'direction': this.direction-40+randomInt(80),
+                                          'speed': (this.speed)+randomInt(3),
+                                          'ttl': this.ttl + randomInt(30)
                                         })
                             );
     }
@@ -180,7 +185,7 @@ function ParticleFountain(params){
   this.update = function(){
     for(var i = 0; i < this.count; i++){
       if(this.particles[i].update()){
-        var color_mod = random(150);
+        var color_mod = randomInt(150);
         this.particles.splice(i, 1);
         this.particles.push(new Particle({'x': this.x, 
                                         'y': this.y, 
@@ -188,9 +193,9 @@ function ParticleFountain(params){
                                         'red': this.r+color_mod,
                                         'green': this.g+color_mod/2,
                                         'blue': this.b+color_mod/2,
-                                        'direction': this.direction-40+random(80),
-                                        'speed': this.speed*random(1)+1,
-                                        'ttl': random(10)+20
+                                        'direction': this.direction-40+randomInt(80),
+                                        'speed': (this.speed)+randomInt(3),
+                                        'ttl': this.ttl + randomInt(30)
                                       })
                             );
       }
@@ -210,21 +215,23 @@ function ParticleFountain(params){
       
       if(this.particles[i].update()){
         this.particles.splice(i, 1);
-        var color_mod = random(150);
+        var color_mod = randomInt(150);
         this.particles.push(new Particle({'x': this.x, 
                                         'y': this.y, 
                                         'context': this.context,
                                         'red': this.r+color_mod,
                                         'green': this.g+color_mod/2,
                                         'blue': this.b+color_mod/2,
-                                        'direction': this.direction-30+random(60),
-                                        'speed': this.speed*random(2)+1
+                                        'direction': this.direction-30+randomInt(60),
+                                        'speed': this.speed*randomInt(2)+1,
+                                        'ttl': this.ttl + randomInt(30)
                                       })
                             );
       };
     }
   }
   
+  this.ttl = params.ttl || 60;
   this.context = params.context;
   this.direction = params.direction; // degrees
   this.x = params.x;
@@ -236,79 +243,6 @@ function ParticleFountain(params){
   this.b = params.blue;
   this.particles = [];
   this.init();
-}
-
-
-//-----------------------------------------------------------------------------------
-// CollisionMap: accepts two arguments, the width and height in pixels of the current context. This object
-// provides collision detection in a fast, portable way
-//-----------------------------------------------------------------------------------
-function CollisionMap(width, height){
-  
-  this.createMapTable = function(){
-    this.cols = this.width / this.cell_size;
-    this.rows = this.height / this.cell_size;
-    this.map_size = this.cols * this.rows;
-    
-    for(var i = 0; i < this.map_size; i++){
-      this.map[i] = [];
-    }
-    return true;
-  }
-  
-  this.clearMap = function(){
-    for(var i = 0; i < this.map_size; i++){
-      this.map[i] = [];
-    }
-    return true;
-  }
-  
-  this.updateMap = function(){
-    this.clearMap();
-  }
-  
-  this.addObject = function(entity){
-    // don't operate on an ~null object
-    if(entity == undefined){
-      return -1;
-    }
-    
-    var object_cell_id = ( (Math.floor(entity.x/this.cell_size)) + (Math.floor(entity.y/this.cell_size)) * (this.width/this.cell_size) );
-    
-    if(object_cell_id >= this.map_size || object_cell_id < 0){
-      return false;
-    }
-    
-    this.map[object_cell_id].push(entity);
-    return object_cell_id;
-  }
-  
-  // This returns the nearby objects of a single object. Accepts the object id
-  this.nearbyObjects = function(entity){
-    // don't operate on a ~null object
-    if(entity == undefined){
-      return -1;
-    }
-        
-    var object_cell_id = ((Math.floor(entity.x/this.cell_size)) + (Math.floor(entity.y/this.cell_size)) * (this.width/this.cell_size) );
-    
-    if(object_cell_id >= this.map_size || object_cell_id < 0){
-      return false;
-    }
-    
-    if(this.map[object_cell_id].length > 0){
-      return this.map[object_cell_id];
-    }
-    return false;
-  }
-  
-  this.cols = 0;
-  this.rows = 0;
-  this.width = width;
-  this.height = height;
-  this.cell_size = 40; // in pixels
-  this.map_size = 0;
-  this.map = []
 }
 
 
@@ -395,5 +329,64 @@ function EntityList(){
       this.entities[i].draw();
     }
   }
+}
+
+
+//-----------------------------------------------------------------------------------
+// CollisionMap: accepts two arguments, the width and height in pixels of the current context. This object
+// provides collision detection in a fast, portable way
+//-----------------------------------------------------------------------------------
+function CollisionMap(width, height){
   
+  // This gets called when you create the object
+  this.createMapTable = function(){
+    this.cols = this.width / this.cell_size;
+    this.rows = this.height / this.cell_size;
+    this.map_size = this.cols * this.rows;
+    
+    for(var i = 0; i < this.map_size; i++){
+      this.map[i] = [];
+    }
+    return true;
+  }
+  
+  this.clearMap = function(){
+    for(var i = 0; i < this.map_size; i++){
+      this.map[i] = [];
+    }
+    return true;
+  }
+  
+  this.updateMap = function(){
+    this.clearMap();
+  }
+  
+  // This returns the nearby objects of a single object. Accepts an object as the argument
+  this.nearbyObjects = function(entity){
+    // don't operate on a ~null object
+    if(entity == undefined){
+      return -1;
+    }
+        
+    var object_cell_id = ((Math.floor(entity.x/this.cell_size)) + (Math.floor(entity.y/this.cell_size)) * (this.width/this.cell_size) );
+    
+    if(object_cell_id >= this.map_size || object_cell_id < 0){
+      return false;
+    }
+    
+    if(this.map[object_cell_id].length > 0){
+      return this.map[object_cell_id];
+    }
+    return false;
+  }
+  
+  this.cols = 0;
+  this.rows = 0;
+  this.width = width;
+  this.height = height;
+  this.cell_size = 40; // in pixels
+  this.map_size = 0;
+  this.map = []
+
+  this.createMapTable();
 }
