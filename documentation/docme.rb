@@ -12,7 +12,15 @@ docme_file_list.each do |f|
 	fp = File.open(f, "r")
 
 	fp.readlines.each do |l|
-		# puts l
+		if(l =~ object)
+      puts "Found Object: #{$1}(#{$2})"
+    elsif(l =~ object_function)
+      puts "Found Member Function: #{$1}(#{$2})"      
+    elsif(l =~ function)
+      puts "Found Function: #{$1}(#{$2})"      
+    elsif(l =~ extended)
+      puts "Found Extended: #{$1} => #{$2}(#{$3})"      
+    end
 	end
 end
 

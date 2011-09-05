@@ -83,9 +83,27 @@ function KeyHandler(){
 
 
 //-----------------------------------------------------------------------------------
+// ImageHandler: This handles static images not frames just images
+//-----------------------------------------------------------------------------------
+function ImageHandler(params){
+  
+  this.draw = function(sx, sy, sw, sh, dx, dy, dw, dh){
+    this.context.save();
+    this.context.drawImage(this.image, sx, sy, sw, sh, dx, dy, dw, dh);
+    this.context.restore();
+  }
+
+  this.context = params.context;
+  this.image_path = params.image_path;
+  this.image = new Image();
+  this.image.src = this.image_path;
+
+}
+
+//-----------------------------------------------------------------------------------
 // SpriteHandler: This handles the images, there frames if it is an animation and any transformations
 //-----------------------------------------------------------------------------------
-function SpriteHandler(){
+function SpriteHandler(params){
   this.initSprite = function(params){
     this.context = params.context;
     this.path = params.path;
@@ -116,7 +134,7 @@ function SpriteHandler(){
     return this.direction - 90;
   }
   
-  this.context = context;
+  this.context = params.context;
   this.direction = 0; // degrees
   this.rot = 0;
 }

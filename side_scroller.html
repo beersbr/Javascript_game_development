@@ -1,10 +1,55 @@
 <html>
 <head>
-  <title>Side Scroller</title>
-  <script type="text/javascript" src='javascripts/games_common_v0.2.hs'></script>
-  
+<title>Side Scroller</title>
+<style type="text/css">
+#canvas{
+  border: 10px solid black;
+}
+</style>
+<script type="text/javascript" src='javascripts/games_common_v0.2.js'></script>  
+<script type="text/javascript">
+function Player(params){
+  this.inheritFrom = Entity;
+  this.inheritFrom(params);
+
+  this.update = function(){
+    
+  }
+
+  this.draw = function(){
+    
+  }
+
+  this.friction = params.friction;
+
+}
+
+window.onload = function(){
+  key = new KeyHandler();
+  ctx = document.getElementById('canvas').getContext('2d');
+  background = new ImageHandler({'context': ctx, 'image_path': 'images/game_bg.png'});
+  player = new Player({'context': ctx, 'x': 320, 'y': 240});
+    
+  image_x = 0; 
+
+
+
+  setInterval(function(){
+
+
+    image_x++;
+
+    ctx.clearRect(0, 0, 640, 480);
+    background.draw(image_x%(background.image.width-640), 0, 640, 480, 0, 0, 640, 480);
+    // p.draw();
+  }, 1000/24);
+   
+};
+
+</script>
+
 </head>
 <body>
-
+<canvas id='canvas' width='640px' height='480px'></canvas>
 </body>
 </html>
