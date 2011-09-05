@@ -336,6 +336,7 @@ function EntityList(){
 // CollisionMap: accepts two arguments, the width and height in pixels of the current context. This object
 // provides collision detection in a fast, portable way
 //-----------------------------------------------------------------------------------
+// TODO: Finish this
 function CollisionMap(params){
   // This gets called when you create the object
   this.init = function(){
