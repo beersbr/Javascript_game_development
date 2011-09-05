@@ -336,10 +336,9 @@ function EntityList(){
 // CollisionMap: accepts two arguments, the width and height in pixels of the current context. This object
 // provides collision detection in a fast, portable way
 //-----------------------------------------------------------------------------------
-function CollisionMap(width, height){
-  
+function CollisionMap(params){
   // This gets called when you create the object
-  this.createMapTable = function(){
+  this.init = function(){
     this.cols = this.width / this.cell_size;
     this.rows = this.height / this.cell_size;
     this.map_size = this.cols * this.rows;
@@ -361,32 +360,19 @@ function CollisionMap(width, height){
     this.clearMap();
   }
   
-  // This returns the nearby objects of a single object. Accepts an object as the argument
   this.nearbyObjects = function(entity){
-    // don't operate on a ~null object
-    if(entity == undefined){
-      return -1;
-    }
-        
-    var object_cell_id = ((Math.floor(entity.x/this.cell_size)) + (Math.floor(entity.y/this.cell_size)) * (this.width/this.cell_size) );
     
-    if(object_cell_id >= this.map_size || object_cell_id < 0){
-      return false;
-    }
-    
-    if(this.map[object_cell_id].length > 0){
-      return this.map[object_cell_id];
-    }
-    return false;
   }
   
   this.cols = 0;
   this.rows = 0;
-  this.width = width;
-  this.height = height;
-  this.cell_size = 40; // in pixels
-  this.map_size = 0;
-  this.map = []
+  this.width = params.width;
+  this.height = params.height;
+  this.cell_size = params.cell_size; // in pixels
+  this.hash_size = 0;
+  this.hash = [];
 
-  this.createMapTable();
+  this.entity_list = params.entity_list || new EntityList();
+
+  this.init();
 }
