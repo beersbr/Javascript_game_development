@@ -6,50 +6,85 @@
   border: 10px solid black;
 }
 </style>
-<script type="text/javascript" src='javascripts/games_common_v0.2.js'></script>  
+<script type="text/javascript" src='javascripts/games_common_v0.2.js'></script>
 <script type="text/javascript">
+
 function Player(params){
   this.inheritFrom = Entity;
   this.inheritFrom(params);
 
   this.update = function(){
-    
+    this.ax *= this.friction;
+    this.ay *= this.friction;
+    this.x += Math.round(this.ax);
+    this.y += Math.round(this.ay);
   }
 
   this.draw = function(){
-    
+    this.context.save();
+    this.context.fillStyle = "rgb(155, 155, 155)";
+    this.context.fillRect(this.x-40, this.y-40, 80, 80);
+    this.context.restore();
   }
 
-  this.friction = params.friction;
+  this.friction = params.friction || 0.88;
 
 }
 
 window.onload = function(){
   key = new KeyHandler();
   ctx = document.getElementById('canvas').getContext('2d');
-  background = new ImageHandler({'context': ctx, 'image_path': 'images/game_bg.png'});
+  background = new ImageHandler({'context': ctx, 'image_path': 'images/game_bg1.png'});
   player = new Player({'context': ctx, 'x': 320, 'y': 240});
-    
-  image_x = 0; 
+  fps = 0;
+  fps_tag = document.getElementById('fps');
+  var speed = 1;
+  image_x = 0;
 
+  var level_width = background.image.width;
 
 
   setInterval(function(){
+    fps_tag.innerHTML = fps.toString();
+    fps = 0;
+  }, 1000);
 
+  setInterval(function(){
+    fps++;
+    //update
+    if(key.keyIs('a')){
+      player.ax -= speed;
+    }
+    if(key.keyIs('d')){
+      player.ax += speed;
+    }
+    if(key.keyIs('w')){
+      player.ay -= speed;
+    }
+    if(key.keyIs('s')){
+      player.ay += speed;
+    }
 
+    player.update();
     image_x++;
 
+    //drawing
+    
     ctx.clearRect(0, 0, 640, 480);
-    background.draw(image_x%(background.image.width-640), 0, 640, 480, 0, 0, 640, 480);
-    // p.draw();
-  }, 1000/24);
-   
+    
+    player.draw();
+
+  }, 1000/60);
+
 };
 
 </script>
 
 </head>
 <body>
+<div>
+  FPS: <span id='fps'></span>
+</div>
 <canvas id='canvas' width='640px' height='480px'></canvas>
 </body>
 </html>
