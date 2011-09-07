@@ -14,9 +14,6 @@ function Player(params){
   this.inheritFrom(params);
 
   this.update = function(){
-    // console.log("ax: "+this.ax+" ay: "+this.ay);
-    // console.log("angle: "+Math.atan2(this.ax, this.ay)*(180/Math.PI)); 
-    console.log("angle: "+angle_of_velocity_degrees_real(this));
     this.ax *= this.friction;
     this.ay *= this.friction;
     this.x += this.ax;
@@ -35,16 +32,13 @@ function Player(params){
   this.height = 40;
 }
 
-function clear(ctx){
-  // if(navigator.appCodeName)
-}
-
 window.onload = function(){
-  console.log(window.dataBrowser);
-
-  key = new KeyHandler();
   cvs = document.getElementById('canvas');
   ctx = cvs.getContext('2d');
+  key = new KeyHandler();
+  key.listenerOffsetY = cvs.offsetTop;
+  console.log(cvs.offsetLeft);
+  key.listenerOffsetX = cvs.offsetLeft;
 
   // create the buffer
   cvs_buffer = document.createElement('canvas');
@@ -88,12 +82,14 @@ window.onload = function(){
       clearInterval(g);
       clearInterval(f);
     }
-
+    if(key.key(0)){
+      console.log(key.mouse());
+    }
     player.update();
 
     //drawing
     ctx_buffer.clearRect(0, 0, 640, 480);
-    // ctx.clearRect(0, 0, 640, 480);
+    ctx.clearRect(0, 0, 640, 480);
 
     player.draw();
     ctx.drawImage(cvs_buffer, 0, 0);
