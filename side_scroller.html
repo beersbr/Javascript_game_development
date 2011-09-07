@@ -14,43 +14,63 @@ function Player(params){
   this.inheritFrom(params);
 
   this.update = function(){
+    // console.log("ax: "+this.ax+" ay: "+this.ay);
+    // console.log("angle: "+Math.atan2(this.ax, this.ay)*(180/Math.PI)); 
+    console.log("angle: "+angle_of_velocity_degrees_real(this));
     this.ax *= this.friction;
     this.ay *= this.friction;
-    this.x += Math.round(this.ax);
-    this.y += Math.round(this.ay);
+    this.x += this.ax;
+    this.y += this.ay;
   }
 
   this.draw = function(){
     this.context.save();
     this.context.fillStyle = "rgb(155, 155, 155)";
-    this.context.fillRect(this.x-40, this.y-40, 80, 80);
+    this.context.fillRect(this.x-this.width/2, this.y-this.height/2, this.width, this.height);
     this.context.restore();
   }
 
-  this.friction = params.friction || 0.88;
+  this.friction = params.friction || 0.8;
+  this.width = 40;
+  this.height = 40;
+}
 
+function clear(ctx){
+  // if(navigator.appCodeName)
 }
 
 window.onload = function(){
+  console.log(window.dataBrowser);
+
   key = new KeyHandler();
-  ctx = document.getElementById('canvas').getContext('2d');
-  background = new ImageHandler({'context': ctx, 'image_path': 'images/game_bg1.png'});
-  player = new Player({'context': ctx, 'x': 320, 'y': 240});
+  cvs = document.getElementById('canvas');
+  ctx = cvs.getContext('2d');
+
+  // create the buffer
+  cvs_buffer = document.createElement('canvas');
+  cvs_buffer.width = cvs.width;
+  cvs_buffer.height = cvs.height;
+  ctx_buffer = cvs_buffer.getContext('2d');
+
+  background = new ImageHandler({'context': ctx_buffer, 'image_path': 'images/game_bg1.png'});
+  player = new Player({'context': ctx_buffer, 'x': 320, 'y': 240});
+  
   fps = 0;
   fps_tag = document.getElementById('fps');
   var speed = 1;
-  image_x = 0;
+  imgx = 0;
+  imgy = 0;
 
   var level_width = background.image.width;
 
 
-  setInterval(function(){
+  f = setInterval(function(){
     fps_tag.innerHTML = fps.toString();
     fps = 0;
   }, 1000);
 
-  setInterval(function(){
-    fps++;
+  g = setInterval(function(){
+    
     //update
     if(key.keyIs('a')){
       player.ax -= speed;
@@ -64,16 +84,21 @@ window.onload = function(){
     if(key.keyIs('s')){
       player.ay += speed;
     }
+    if(key.keyIs('q')){
+      clearInterval(g);
+      clearInterval(f);
+    }
 
     player.update();
-    image_x++;
 
     //drawing
-    
-    ctx.clearRect(0, 0, 640, 480);
-    
-    player.draw();
+    ctx_buffer.clearRect(0, 0, 640, 480);
+    // ctx.clearRect(0, 0, 640, 480);
 
+    player.draw();
+    ctx.drawImage(cvs_buffer, 0, 0);
+    
+    fps++;
   }, 1000/60);
 
 };

@@ -1,0 +1,2 @@
+Test Cases:
+  http://jsperf.com/double-buffering-canvas

@@ -53,6 +53,37 @@ function bind(scope, fn){
 
 
 //-----------------------------------------------------------------------------------
+// Physics: is where physics functions will go. Really just helper functions
+//-----------------------------------------------------------------------------------
+angle_of_velocity_radians = function(entity){
+  return Math.abs(Math.atan2(entity.ax, entity.ay);
+}
+
+angle_of_velocity_radians_real = function(entity){
+  angle = Math.atan2(entity.ax, entity.ay)*(180/Math.PI);
+  angle -= Math.PI/2;
+  if(angle < 0) return angle+(2*Math.PI);
+  return angle;
+}
+
+angle_of_velocity_degrees = function(entity){
+  return Math.atan2(entity.ax, entity.ay)*(180/Math.PI);
+}
+
+angle_of_velocity_degrees_real = function(entity){
+  angle = Math.atan2(entity.ax, entity.ay)*(180/Math.PI);
+  angle -= 90;
+  if(angle < 0) return angle+360;
+  return angle;
+}
+
+
+velocity_of_collision = function(entity, angle_of_collision){
+
+  return ;
+}
+
+//-----------------------------------------------------------------------------------
 // keyHandler: keyHandler takes care of all the key strokes as well as tracking multiple keys and their states.
 //-----------------------------------------------------------------------------------
 function KeyHandler(){
