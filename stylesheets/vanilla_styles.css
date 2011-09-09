@@ -1,9 +1,11 @@
 body{
-  width: 1000px;
+	position: absolute;
+	width: 1000px;
 }
 
 canvas{
-  border: 3px solid black;
-  margin: auto;
-  width: 640px;
+	border: 3px solid black;
+	display: block;
+	margin: auto;
+	width: 640px;
 }

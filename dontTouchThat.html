@@ -1,8 +1,167 @@
 <!doctype html>
 <html>
 <head>
-  <title>Don't touch that!</title>
-  <link rel="stylesheet" type="text/css" href="stylesheets/vanilla_styles.css">
+<title>Don't touch that!</title>
+<link rel="stylesheet" type="text/css" href="stylesheets/vanilla_styles.css" />
+<script type="text/javascript" src="javascripts/games_common_v0.2.js"></script>
+<script type="text/javascript">
+//*************************************************************************************
+// Game objects
+//*************************************************************************************
+
+function Player(params){
+	this.inheritFrom = Entity;
+	this.inheritFrom(params);
+
+	this.init = function(path){
+		this.image = new Image();
+		this.src = path;
+		this.up = []
+	}
+
+	this.draw = function(){
+		this.context.fillRect(this.x-this.width/2, this.y-this.height/2, this.width, this.height);
+	}
+
+	this.update = function(){
+		this.ax *= this.friction;
+		this.ay *= this.friction;
+
+		// this.ax = this.ax < 0.1 ? 0 : this.ax
+		// this.ay = this.ay < 0.1 ? 0 : this.ay
+
+		var realx = this.ax;
+		var realy = this.ay;
+
+		if(this.x + this.ax > width){
+			this.x = width;
+		}
+		if(this.x + this.ax < 0){
+			this.x = 0;
+		}
+		if(this.y + this.ay > height){
+			this.y = height;
+		}
+		if(this.y + this.ay < 0){
+			this.y = 0;
+		}
+
+		this.x += realx;
+		this.y += realy;
+		console.log('ax: '+this.ax+' ay: '+this.ay);
+
+		// get direction
+
+		if(this.ax < 0.2 && this.ax > -0.2 || this.ay < 0.2 && this.ax > -0.2){
+			this.is_moving = false;
+		}
+		else{
+			this.is_moving = true;
+		}
+
+		if(this.is_moving){
+			abs_ax = Math.abs(this.ax);
+			abs_ay = Math.abs(this.ay);
+
+			if(this.ax > 0 && abs_ax > abs_ay){
+			}
+			else if(this.ax < 0 && abs_ax > abs_ay){
+			}
+		}
+		return true;
+	}
+
+	this.friction = 0.89;
+	this.is_moving = false;
+
+	this.direction = 0;
+	var directions = {'up': 0, 'right': 1, 'down': 2, 'left': 3};
+
+	this.image = null;
+	this.animated_sprite_w = 16;
+	this.animated_sprite_h = 24;
+}
+
+fps_counter = function(){
+	console.log("FPS: "+fps_c);
+	fps_c = 0;
+}
+
+init = function(){
+	red_block = new Image();
+	red_block.src = "images/block_red.png";
+
+	blue_block = new Image();
+	blue_block.src = "images/block_blue.png";
+
+	background = new Image();
+	background.src = "images/static_green.png";
+}
+
+game = function(){
+	//update
+	if(key.keyIs('a')){
+		p.ax -= 1; 
+	}
+	if(key.keyIs('d')){
+		p.ax += 1;
+	}
+	if(key.keyIs('s')){
+		p.ay += 1;
+	}
+	if(key.keyIs('w')){
+		p.ay -= 1;
+	}
+
+	if(key.keyIs('q')){
+		clearInterval(game_interval);
+		clearInterval(fps_func);
+		console.log("****************< STOPPED >****************");
+	}
+
+	p.update();
+
+	//detect collision
+
+	//draw
+	_context.clearRect(0, 0, width, height);
+	_context.drawImage(background, 0, 0);
+
+	_context.drawImage(red_block, 0, 0, 40, 40);
+	p.draw();
+
+	context.drawImage(_canvas, 0, 0);
+
+	fps_c++;
+}
+
+//*************************************************************************************
+// Starting the actual game logic here...
+//*************************************************************************************
+window.onload = function(){
+	fps_c = 0;
+	key = new KeyHandler(false);
+	canvas = document.getElementById("canvas");
+	context = canvas.getContext('2d');
+
+	_canvas = document.createElement('canvas');
+	_canvas.width = canvas.width;
+	_canvas.height = canvas.height;
+	_context = _canvas.getContext('2d');
+
+	width = canvas.width;
+	height = canvas.height;
+
+	var fps = 60;
+	p = new Player({'context': _context, 'width': 40, 'height': 40, 'x': 50, 'y': 50});
+
+	init();
+	// Set up the initial game stuff..
+	game_interval = setInterval(game, 1000/fps);
+	fps_func = setInterval(fps_counter, 1000);
+
+}	
+</script>
 </head>
 <body>
   <canvas id='canvas' width="640px" height="480px"></canvas>
