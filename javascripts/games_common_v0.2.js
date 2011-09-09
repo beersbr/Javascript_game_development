@@ -343,7 +343,15 @@ function Entity(init){
   this.inheritFrom = SpriteHandler;
   this.inheritFrom(init.context, init.sprite_path);
   
-  this.isCollidingWith = function(x2, y2, w1, h1){
+  this.isCollidingWith = function(entity){
+    x1 = this.x + this.width;
+    y1 = this.y + this.height;
+    x3 = entity.x + entity.width;
+    y3 = entity.y + entity.height;
+    return !(x1<entity.x || x3<this.x || y1<entity.y || y3<this.y);
+  }
+
+  this.isCollidingWithPos = function(x2, y2, w1, h1){
     x1 = this.x + this.width;
     y1 = this.y + this.height;
     x3 = x2 + w1;
