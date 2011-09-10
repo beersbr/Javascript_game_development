@@ -348,19 +348,37 @@ function Entity(init){
   this.inheritFrom(init.context, init.sprite_path);
   
   this.isCollidingWith = function(entity){
-    x1 = this.x + this.width;
-    y1 = this.y + this.height;
-    x3 = entity.x + entity.width;
-    y3 = entity.y + entity.height;
-    return !(x1<entity.x || x3<this.x || y1<entity.y || y3<this.y);
+    x1 = this.x-this.width/2 + this.width;
+    y1 = this.y-this.height/2 + this.height;
+    x3 = entity.x-entity.width/2 + entity.width;
+    y3 = entity.y-entity.height/2 + entity.height;
+
+    return !(x1<entity.x-entity.width/2 || x3<this.x-this.width/2 || y1<entity.y-entity.height/2 || y3<this.y-this.height/2);
+  }
+
+  this.isCollidingWith_preEmptive = function(entity){
+    x1 = (this.x+this.ax)-this.width/2 + this.width;
+    y1 = (this.y+this.ay)-this.height/2 + this.height;
+    x3 = entity.x-entity.width/2 + entity.width;
+    y3 = entity.y-entity.height/2 + entity.height;
+    
+    return !(x1<entity.x-entity.width/2 || x3<this.x-this.width/2 || y1<entity.y-entity.height/2 || y3<this.y-this.height/2);
   }
 
   this.isCollidingWithPos = function(x2, y2, w1, h1){
-    x1 = this.x + this.width;
-    y1 = this.y + this.height;
+    x1 = this.x-this.width/2 + this.width;
+    y1 = this.y-this.height/2 + this.height;
     x3 = x2 + w1;
     y3 = y2 + h1;
-    return !(x1<x2 || x3<this.x || y1<y2 || y3<this.y);
+    return !(x1<x2 || x3<this.x-this.width/2 || y1<y2 || y3<this.y-this.height/2);
+  }
+
+  this.isCollidingWithPos_preEmptive = function(x2, y2, w1, h1){
+    x1 = (this.x+this.ax)-this.width/2 + this.width;
+    y1 = (this.y+this.ay)-this.width/2 + this.height;
+    x3 = x2 + w1;
+    y3 = y2 + h1;
+    return !(x1<x2 || x3<this.x-this.width/2 || y1<y2 || y3<this.y-this.height/2);
   }
 
   // These functions must be here so that they always exist in the child objects
@@ -388,8 +406,8 @@ function Entity(init){
 // ENTITYLIST: EntityList is a list of entities. It will batch your entity stuff together
 //-----------------------------------------------------------------------------------
 function EntityList(){
-  this.collision_map = new CollisionMap(640, 480);
-  this.collision_map.createMapTable();
+  // this.collision_map = new CollisionMap(640, 480);
+  // this.collision_map.createMapTable();
   
   this.entities = [];
   this.size = 0;
@@ -405,25 +423,9 @@ function EntityList(){
   }
   
   this.update = function(){
-    this.collision_map.updateMap();
-    
     for(var i = 0; i < this.size; i++){
-      if(!this.entities[i].update()){
-        this.entities.splice(i, 1);
-        this.size -= 1;
-        continue;
-      }
-      
-      // Check the collision
-      if(this.entities[i].in_collision(this.collision_map.nearbyObjects(this.entities[i])) ){
-        //TODO finish this function
-        // this.entities.
-      }
-      
-      this.collision_map.addObject(this.entities[i]);
-    }
-    
-    return true;
+      this.entities[i].update();
+    } 
   }
   
   this.draw = function(){

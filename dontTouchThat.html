@@ -9,6 +9,9 @@
 // Game objects
 //*************************************************************************************
 
+//*************************************************************************************
+// Player Entity
+//*************************************************************************************
 function Player(params){
 	this.inheritFrom = Entity;
 	this.inheritFrom(params);
@@ -74,8 +77,44 @@ function Player(params){
 			this.y = 0;
 		}
 
+		for(var e = 0; e < elist.entities.length; e++){
+			// get the difference between the me and the object so I can see where I am in relation to that object
+
+			if(this.isCollidingWith(elist.entities[e])){
+				var posx = this.x - elist.entities[e].x;
+				var posy = this.y - elist.entities[e].y;
+				var colx = false;
+				var coly = false;
+
+				Math.abs(posx) > Math.abs(posy) ? coly = true : colx = true;
+
+				if(colx){
+					if(this.x < elist.entities[e].x){
+						this.ax = this.ax > 0 ? 0 : this.ax;
+					}else if(this.x > elist.entities[e].x){
+						this.ax = this.ax < 0 ? 0 : this.ax;
+					}
+					realx = this.ax;
+					continue;
+				}
+
+				if(coly){
+					if(this.y < elist.entities[e].y){
+						this.ay = this.ay > 0 ? 0 : this.ay;
+					}else if(this.y > elist.entities[e].y){
+						this.ay = this.ay < 0 ? 0 : this.ay;
+					}
+					realy = this.ay;
+					continue;
+				}
+
+			}
+		}
+
 		this.x += realx;
 		this.y += realy;
+		this.x = Math.round(this.x);
+		this.y = Math.round(this.y)
 
 		// is the player moving?
 		if(abs_ax < 0.5 && abs_ay < 0.5){
@@ -104,11 +143,36 @@ function Player(params){
 	this.anim_ticker = 0;
 }
 
+//*************************************************************************************
+// Block Entity
+//*************************************************************************************
+function Block(params){
+	this.inheritFrom = Entity;
+	this.inheritFrom(params);
+
+	this.draw = function(){
+		this.context.drawImage(this.image, this.x-this.width/2, this.y-this.height/2, this.width, this.height);
+	}
+
+	this.image = new Image();
+	this.image.src = "images/block_red.png";
+	this.width = 40;
+	this.height = 40;
+}
+
+//*************************************************************************************
+// FPS counter
+//*************************************************************************************
+
 fps_counter = function(){
 	// console.log("FPS: "+fps_c);
 	fps_c = 0;
 }
 
+
+//*************************************************************************************
+// Init function for setting up the images
+//*************************************************************************************
 init = function(){
 	red_block = new Image();
 	red_block.src = "images/block_red.png";
@@ -120,6 +184,9 @@ init = function(){
 	background.src = "images/static_green.png";
 }
 
+//*************************************************************************************
+// The game function that will be running
+//*************************************************************************************
 game = function(){
 	//update
 	if(key.keyIs('a')){
@@ -145,6 +212,7 @@ game = function(){
 		console.log("****************< STOPPED >****************");
 	}
 
+	elist.update();
 	p.update();
 
 	//detect collision
@@ -153,8 +221,7 @@ game = function(){
 	//draw
 	_context.clearRect(0, 0, width, height);
 	_context.drawImage(background, 0, 0);
-
-	_context.drawImage(red_block, 0, 0, 40, 40);
+	elist.draw();
 	p.draw();
 
 	context.drawImage(_canvas, 0, 0);
@@ -180,9 +247,21 @@ window.onload = function(){
 	height = canvas.height;
 
 	var fps = 60;
-	p = new Player({'context': _context, 'width': 40, 'height': 40, 'x': 50, 'y': 50});
+	p = new Player({'context': _context, 'width': 40, 'height': 40, 'x': 50, 'y': 150});
 	p.image = new Image();
 	p.image.src = "images/terra_rip_final.png";
+
+	elist = new EntityList();
+	elist.add(new Block({'context': _context, 'x': 20, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 60, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 100, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 140, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 180, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 220, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 220, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 220, 'y': 60}));
+	elist.add(new Block({'context': _context, 'x': 220, 'y': 100}));
+	elist.add(new Block({'context': _context, 'x': 220, 'y': 140}));
 
 	init();
 	// Set up the initial game stuff..
