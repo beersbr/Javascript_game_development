@@ -13,22 +13,50 @@ function Player(params){
 	this.inheritFrom = Entity;
 	this.inheritFrom(params);
 
-	this.init = function(path){
-		this.image = new Image();
-		this.src = path;
-		this.up = []
-	}
-
 	this.draw = function(){
-		this.context.fillRect(this.x-this.width/2, this.y-this.height/2, this.width, this.height);
+
+
+		if(this.is_moving == false){ // not moving
+			if(this.direction == 0){ // facing up
+				this.context.drawImage(this.image, 16, 0, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}else if(this.direction == 1){
+				this.context.drawImage(this.image, 16, 24, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}else if(this.direction == 2){
+				this.context.drawImage(this.image, 16, 72, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}else if(this.direction == 3){
+				this.context.drawImage(this.image, 16, 48, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}
+		}else{ // moving
+			if(this.anim_ticker == 0){
+				this.left_or_right = !this.left_or_right;
+				this.anim_ticker = 15;
+			}
+			frame = this.left_or_right ? 0 : 32;
+
+			if(this.direction == 0){ // facing up
+				this.context.drawImage(this.image, frame, 0, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}else if(this.direction == 1){
+				this.context.drawImage(this.image, frame, 24, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}else if(this.direction == 2){
+				this.context.drawImage(this.image, frame, 72, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}else if(this.direction == 3){
+				this.context.drawImage(this.image, frame, 48, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
+			}
+			this.anim_ticker--;
+		}
+
+		frame_ticker = 0;
 	}
 
 	this.update = function(){
 		this.ax *= this.friction;
 		this.ay *= this.friction;
 
-		// this.ax = this.ax < 0.1 ? 0 : this.ax
-		// this.ay = this.ay < 0.1 ? 0 : this.ay
+		var abs_ax = Math.abs(this.ax);
+		var abs_ay = Math.abs(this.ay);
+
+		this.ax = abs_ax < 0.01 ? 0 : this.ax
+		this.ay = abs_ay < 0.01 ? 0 : this.ay
 
 		var realx = this.ax;
 		var realy = this.ay;
@@ -48,42 +76,36 @@ function Player(params){
 
 		this.x += realx;
 		this.y += realy;
-		console.log('ax: '+this.ax+' ay: '+this.ay);
 
-		// get direction
-
-		if(this.ax < 0.2 && this.ax > -0.2 || this.ay < 0.2 && this.ax > -0.2){
+		// is the player moving?
+		if(abs_ax < 0.5 && abs_ay < 0.5){
 			this.is_moving = false;
 		}
 		else{
 			this.is_moving = true;
 		}
 
-		if(this.is_moving){
-			abs_ax = Math.abs(this.ax);
-			abs_ay = Math.abs(this.ay);
-
-			if(this.ax > 0 && abs_ax > abs_ay){
-			}
-			else if(this.ax < 0 && abs_ax > abs_ay){
-			}
-		}
 		return true;
 	}
+
+	this.width = 32;
+	this.height = 48;
 
 	this.friction = 0.89;
 	this.is_moving = false;
 
 	this.direction = 0;
-	var directions = {'up': 0, 'right': 1, 'down': 2, 'left': 3};
+	var directions = {'up': 0, 'right': 3, 'down': 1, 'left': 2};
 
-	this.image = null;
+	this.image = new Image();
 	this.animated_sprite_w = 16;
 	this.animated_sprite_h = 24;
+	this.left_or_right = false
+	this.anim_ticker = 0;
 }
 
 fps_counter = function(){
-	console.log("FPS: "+fps_c);
+	// console.log("FPS: "+fps_c);
 	fps_c = 0;
 }
 
@@ -101,16 +123,20 @@ init = function(){
 game = function(){
 	//update
 	if(key.keyIs('a')){
-		p.ax -= 1; 
+		p.ax -= 1;
+		p.direction = 3;
 	}
 	if(key.keyIs('d')){
 		p.ax += 1;
+		p.direction = 2;
 	}
 	if(key.keyIs('s')){
 		p.ay += 1;
+		p.direction = 1;
 	}
 	if(key.keyIs('w')){
 		p.ay -= 1;
+		p.direction = 0;
 	}
 
 	if(key.keyIs('q')){
@@ -122,6 +148,7 @@ game = function(){
 	p.update();
 
 	//detect collision
+	// TODO
 
 	//draw
 	_context.clearRect(0, 0, width, height);
@@ -154,6 +181,8 @@ window.onload = function(){
 
 	var fps = 60;
 	p = new Player({'context': _context, 'width': 40, 'height': 40, 'x': 50, 'y': 50});
+	p.image = new Image();
+	p.image.src = "images/terra_rip_final.png";
 
 	init();
 	// Set up the initial game stuff..
