@@ -86,7 +86,7 @@ function Player(params){
 				var colx = false;
 				var coly = false;
 
-				Math.abs(posx) > Math.abs(posy) ? coly = true : colx = true;
+				Math.abs(posx) < Math.abs(posy) ? coly = true : colx = true;
 
 				if(colx){
 					if(this.x < elist.entities[e].x){
@@ -95,7 +95,6 @@ function Player(params){
 						this.ax = this.ax < 0 ? 0 : this.ax;
 					}
 					realx = this.ax;
-					continue;
 				}
 
 				if(coly){
@@ -105,7 +104,6 @@ function Player(params){
 						this.ay = this.ay < 0 ? 0 : this.ay;
 					}
 					realy = this.ay;
-					continue;
 				}
 
 			}
