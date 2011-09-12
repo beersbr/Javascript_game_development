@@ -84,36 +84,40 @@ function Player(params){
 		for(var e = 0; e < elist.entities.length; e++){
 			// get the difference between the me and the object so I can see where I am in relation to that object
 
-			if(this.isCollidingWith_preEmptive(elist.entities[e])){
-				var posx = this.x - elist.entities[e].x;
-				var posy = this.y - elist.entities[e].y;
-				var colx = false;
-				var coly = false;
-
-				var colx = Math.abs(posx) <= Math.abs(posy) ? false : true;
-
-				console.log("E => "+elist.entities[e].id);
-				console.log("\ttest: "+colx+"\n\tx: "+Math.abs(posx)+"\n\ty: "+Math.abs(posy));
-
-				if(colx){
-					console.log('\tcolliding x');
-
-					if(this.x < elist.entities[e].x){
-						this.ax = this.ax > 0 ? 0 : this.ax;
-					}else if(this.x > elist.entities[e].x){
-						this.ax = this.ax < 0 ? 0 : this.ax;
+			var dir = this.collidesAt(elist.entities[e]);
+			if(dir[1] || dir[2] || dir[3] || dir[4]){
+				var collision = false;
+				// console.log("collides with: "+elist.entities[e].id+" at "+directions_index[dir]);
+				if(dir[1]){
+					if(!collision){
+						this.y = elist.entities[e].y - elist.entities[e].height/2 - this.height/2;
+						collision = true;
 					}
-					realx = this.ax;
 				}
-				else{
-					console.log('\tcolliding y');
-
-					if(this.y < elist.entities[e].y){
-						this.ay = this.ay > 0 ? 0 : this.ay;
-					}else if(this.y > elist.entities[e].y){
-						this.ay = this.ay < 0 ? 0 : this.ay;
+				if(dir[2]){
+					if(!collision){
+						this.y = elist.entities[e].y + elist.entities[e].height/2 + this.height/2;
+						collision = true;
 					}
-					realy = this.ay;
+				}
+				if(dir[3]){
+					if(!collision){
+						this.x = elist.entities[e].x - elist.entities[e].width/2 - this.width/2;
+						collision = true;
+					}
+				}
+				if(dir[4]){
+					if(!collision){
+						this.x = elist.entities[e].x + elist.entities[e].width/2 + this.width/2;
+						collision = true;
+					}
+				}
+
+				if(dir == 1 || dir == 2){
+					realy = 0;
+				}
+				if(dir == 3 || dir == 4){
+					realx = 0;
 				}
 
 			}
@@ -138,11 +142,12 @@ function Player(params){
 	this.width = params.width;
 	this.height = params.height;
 
-	this.friction = 0.89;
+	this.friction = 0.87;
 	this.is_moving = false;
 
 	this.direction = 0;
-	var directions = {'up': 0, 'right': 3, 'down': 1, 'left': 2};
+	var directions_index = {1: 'top', 2: 'bottom', 3: 'left', 4: 'right'};
+	var directions = {'top': 1, 'bottom': 2, 'left': 3, 'right': 4};
 
 	this.image = new Image();
 	this.animated_sprite_w = 16;
@@ -160,6 +165,7 @@ function Block(params){
 
 	this.draw = function(){
 		this.context.drawImage(this.image, this.x-this.width/2, this.y-this.height/2, this.width, this.height);
+		this.context.fillText(this.id.toString(), this.x, this.y);
 	}
 
 	this.image = new Image();
@@ -260,11 +266,11 @@ window.onload = function(){
 	p.image.src = "images/terra_rip_final.png";
 
 	elist = new EntityList();
-	elist.add(new Block({'context': _context, 'x': 20, 'y': 20}));
-	elist.add(new Block({'context': _context, 'x': 60, 'y': 20}));
-	elist.add(new Block({'context': _context, 'x': 100, 'y': 20}));
-	elist.add(new Block({'context': _context, 'x': 140, 'y': 20}));
-	elist.add(new Block({'context': _context, 'x': 180, 'y': 20}));
+	// elist.add(new Block({'context': _context, 'x': 20, 'y': 20}));
+	// elist.add(new Block({'context': _context, 'x': 60, 'y': 20}));
+	// elist.add(new Block({'context': _context, 'x': 100, 'y': 20}));
+	// elist.add(new Block({'context': _context, 'x': 140, 'y': 20}));
+	// elist.add(new Block({'context': _context, 'x': 180, 'y': 20}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 20}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 20}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 60}));
@@ -279,9 +285,9 @@ window.onload = function(){
 
 	elist.add(new Block({'context': _context, 'x': 380, 'y': 180}));
 	elist.add(new Block({'context': _context, 'x': 380, 'y': 220}));
-	elist.add(new Block({'context': _context, 'x': 380, 'y': 260}));
-	elist.add(new Block({'context': _context, 'x': 380, 'y': 300}));
-	elist.add(new Block({'context': _context, 'x': 380, 'y': 340}));
+	// elist.add(new Block({'context': _context, 'x': 380, 'y': 260}));
+	// elist.add(new Block({'context': _context, 'x': 380, 'y': 300}));
+	// elist.add(new Block({'context': _context, 'x': 380, 'y': 340}));
 
 	init();
 	// Set up the initial game stuff..
