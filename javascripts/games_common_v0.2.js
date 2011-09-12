@@ -348,11 +348,6 @@ function Entity(init){
   this.inheritFrom(init.context, init.sprite_path);
 
   this.collidesAt = function(entity){
-    // var left1, left2;
-    // var right1, right2;
-    // var top1, top2;
-    // var bottom1, bottom2;
-
     var left1 = (this.x-this.width/2);
     var left2 = (entity.x-entity.width/2);
     var right1 = (this.x+this.width/2);
@@ -364,13 +359,34 @@ function Entity(init){
 
     var ret = [false, false, false, false, false];
 
-    if(bottom1 > top2 && bottom1 < bottom2 && this.x < (entity.x+entity.width/2) && this.x > (entity.x-entity.width/2))  ret[1] = true; // im colliding with the top of entity
+    // TODO add the rest of the detection here. the top boundry and the lower boundry for the sides etc.
+    if(bottom1 > top2 && bottom1 < bottom2 && this.x < (entity.x+entity.width/2) && this.x > (entity.x-entity.width/2))  ret[1] = true; // im colliding with the top    of entity
     if(top1 < bottom2 && top1 > top2 && this.x < (entity.x+entity.width/2) && this.x > (entity.x-entity.width/2))        ret[2] = true; // im colliding with the bottom of entity
-    if(right1 > left2 && right1 < right2 && this.y < (entity.y+entity.height/2) && this.y > (entity.y-entity.height/2))  ret[3] = true; // im colliding with the left the entity
-    if(left1 < right2 && left1 > left2 && this.y < (entity.y+entity.height/2) && this.y > (entity.y-entity.height/2))    ret[4] = true; // im colliding with the right of entity
+    if(right1 > left2 && right1 < right2 && this.y < (entity.y+entity.height/2) && this.y > (entity.y-entity.height/2))  ret[3] = true; // im colliding with the left   of entity
+    if(left1 < right2 && left1 > left2 && this.y < (entity.y+entity.height/2) && this.y > (entity.y-entity.height/2))    ret[4] = true; // im colliding with the right  of entity
 
     return ret;
+  }
 
+  this.collidesAt2 = function(entity){
+    var left1 = (this.x-this.width/2);
+    var left2 = (entity.x-entity.width/2);
+    var right1 = (this.x+this.width/2);
+    var right2 = (entity.x+entity.width/2);
+    var top1 = (this.y-this.height/2);
+    var top2 = (entity.y-entity.height/2);
+    var bottom1 = (this.y+this.height/2);
+    var bottom2 = (entity.y+entity.height/2);
+
+    var ret = [false, false, false, false, false];
+
+    // TODO add the rest of the detection here. the top boundry and the lower boundry for the sides etc.
+    if(bottom1 > top2    && bottom1 < bottom2 && (( left1 < right2 && left1 > left2   ) || (right1  > left2     && right1  < right2 ))) ret[1] = true; // im colliding with the top    of entity
+    if(top1    < bottom2 && top1    > top2    && (( left1 < right2 && left1 > left2   ) || (right1  > left2     && right1  < right2 ))) ret[2] = true; // im colliding with the bottom of entity
+    if(right1  > left2   && right1  < right2  && ((  top1 > top2   && top1  < bottom2 ) || (bottom1 < bottom2   && bottom1 > top2   ))) ret[3] = true; // in colliding with the left   of entity
+    if(left1   < right2  && left1   > left2   && ((  top1 > top2   && top1  < bottom2 ) || (bottom1 < bottom2   && bottom1 > top2   ))) ret[4] = true; // im colliding with the right  of entity
+
+    return ret;
   }
 
   this.isCollidingWith = function(entity){

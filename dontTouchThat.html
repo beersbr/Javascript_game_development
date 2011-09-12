@@ -84,7 +84,7 @@ function Player(params){
 		for(var e = 0; e < elist.entities.length; e++){
 			// get the difference between the me and the object so I can see where I am in relation to that object
 
-			var dir = this.collidesAt(elist.entities[e]);
+			var dir = this.collidesAt2(elist.entities[e]);
 			if(dir[1] || dir[2] || dir[3] || dir[4]){
 				var collision = false;
 				// console.log("collides with: "+elist.entities[e].id+" at "+directions_index[dir]);
