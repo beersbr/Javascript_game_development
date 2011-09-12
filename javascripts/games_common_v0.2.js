@@ -357,8 +357,8 @@ function Entity(init){
   }
 
   this.isCollidingWith_preEmptive = function(entity){
-    x1 = (this.x+this.ax)-this.width/2 + this.width;
-    y1 = (this.y+this.ay)-this.height/2 + this.height;
+    x1 = (this.x+this.ax)-(this.width+this.ax)/2 + this.width;
+    y1 = (this.y+this.ay)-(this.height+this.ay)/2 + this.height;
     x3 = entity.x-entity.width/2 + entity.width;
     y3 = entity.y-entity.height/2 + entity.height;
     

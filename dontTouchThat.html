@@ -17,8 +17,6 @@ function Player(params){
 	this.inheritFrom(params);
 
 	this.draw = function(){
-
-
 		if(this.is_moving == false){ // not moving
 			if(this.direction == 0){ // facing up
 				this.context.drawImage(this.image, 16, 0, this.animated_sprite_w, this.animated_sprite_h, this.x-this.animated_sprite_w, this.y-this.animated_sprite_h, this.animated_sprite_w*2, this.animated_sprite_h*2);
@@ -49,6 +47,12 @@ function Player(params){
 		}
 
 		frame_ticker = 0;
+
+		this.context.save();
+		this.context.strokeStyle = "rbg(255, 0, 255)";
+		this.context.lineWidth = 2;
+		this.context.strokeRect(this.x-this.width/2, this.y-this.height/2, this.width, this.height);
+		this.context.restore();
 	}
 
 	this.update = function(){
@@ -80,15 +84,20 @@ function Player(params){
 		for(var e = 0; e < elist.entities.length; e++){
 			// get the difference between the me and the object so I can see where I am in relation to that object
 
-			if(this.isCollidingWith(elist.entities[e])){
+			if(this.isCollidingWith_preEmptive(elist.entities[e])){
 				var posx = this.x - elist.entities[e].x;
 				var posy = this.y - elist.entities[e].y;
 				var colx = false;
 				var coly = false;
 
-				Math.abs(posx) < Math.abs(posy) ? coly = true : colx = true;
+				var colx = Math.abs(posx) <= Math.abs(posy) ? false : true;
+
+				console.log("E => "+elist.entities[e].id);
+				console.log("\ttest: "+colx+"\n\tx: "+Math.abs(posx)+"\n\ty: "+Math.abs(posy));
 
 				if(colx){
+					console.log('\tcolliding x');
+
 					if(this.x < elist.entities[e].x){
 						this.ax = this.ax > 0 ? 0 : this.ax;
 					}else if(this.x > elist.entities[e].x){
@@ -96,8 +105,9 @@ function Player(params){
 					}
 					realx = this.ax;
 				}
+				else{
+					console.log('\tcolliding y');
 
-				if(coly){
 					if(this.y < elist.entities[e].y){
 						this.ay = this.ay > 0 ? 0 : this.ay;
 					}else if(this.y > elist.entities[e].y){
@@ -125,8 +135,8 @@ function Player(params){
 		return true;
 	}
 
-	this.width = 32;
-	this.height = 48;
+	this.width = params.width;
+	this.height = params.height;
 
 	this.friction = 0.89;
 	this.is_moving = false;
@@ -245,7 +255,7 @@ window.onload = function(){
 	height = canvas.height;
 
 	var fps = 60;
-	p = new Player({'context': _context, 'width': 40, 'height': 40, 'x': 50, 'y': 150});
+	p = new Player({'context': _context, 'width': 32, 'height': 48, 'x': 50, 'y': 150});
 	p.image = new Image();
 	p.image.src = "images/terra_rip_final.png";
 
@@ -260,6 +270,18 @@ window.onload = function(){
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 60}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 100}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 140}));
+
+	elist.add(new Block({'context': _context, 'x': 300, 'y': 140}));
+	elist.add(new Block({'context': _context, 'x': 340, 'y': 140}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 140}));
+	elist.add(new Block({'context': _context, 'x': 420, 'y': 140}));
+	elist.add(new Block({'context': _context, 'x': 460, 'y': 140}));
+
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 180}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 220}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 260}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 300}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 340}));
 
 	init();
 	// Set up the initial game stuff..
