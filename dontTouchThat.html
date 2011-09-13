@@ -88,39 +88,38 @@ function Player(params){
 			if(dir[1] || dir[2] || dir[3] || dir[4]){
 				var collision = false;
 				// console.log("collides with: "+elist.entities[e].id+" at "+directions_index[dir]);
+
+
 				if(dir[1]){
-					if(!collision){
-						this.y = elist.entities[e].y - elist.entities[e].height/2 - this.height/2;
-						collision = true;
-					}
+					console.log('col top');
+					this.y = elist.entities[e].y - elist.entities[e].height/2 - this.height/2;
 				}
-				if(dir[2]){
-					if(!collision){
-						this.y = elist.entities[e].y + elist.entities[e].height/2 + this.height/2;
-						collision = true;
-					}
+				else if(dir[2]){
+					console.log('col bot');
+					this.y = elist.entities[e].y + elist.entities[e].height/2 + this.height/2;
 				}
-				if(dir[3]){
-					if(!collision){
-						this.x = elist.entities[e].x - elist.entities[e].width/2 - this.width/2;
-						collision = true;
-					}
+								
+				else if(dir[3]){
+					console.log('col left');
+					this.x = elist.entities[e].x - elist.entities[e].width/2 - this.width/2;
 				}
-				if(dir[4]){
-					if(!collision){
-						this.x = elist.entities[e].x + elist.entities[e].width/2 + this.width/2;
-						collision = true;
-					}
+				else if(dir[4]){
+					console.log('col right');
+					this.x = elist.entities[e].x + elist.entities[e].width/2 + this.width/2;
 				}
-
-				if(dir == 1 || dir == 2){
-					realy = 0;
-				}
-				if(dir == 3 || dir == 4){
-					realx = 0;
-				}
-
 			}
+			else{
+								
+				
+			}
+
+			if(dir == 1 || dir == 2){
+				realy = 0;
+			}
+			if(dir == 3 || dir == 4){
+				realx = 0;
+			}
+			
 		}
 
 		this.x += realx;
