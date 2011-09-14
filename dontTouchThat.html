@@ -85,40 +85,14 @@ function Player(params){
 			// get the difference between the me and the object so I can see where I am in relation to that object
 
 			var dir = this.collidesAt2(elist.entities[e]);
-			if(dir[1] || dir[2] || dir[3] || dir[4]){
-				var collision = false;
-				// console.log("collides with: "+elist.entities[e].id+" at "+directions_index[dir]);
-
-
-				if(dir[1]){
-					console.log('col top');
-					this.y = elist.entities[e].y - elist.entities[e].height/2 - this.height/2;
-				}
-				else if(dir[2]){
-					console.log('col bot');
-					this.y = elist.entities[e].y + elist.entities[e].height/2 + this.height/2;
-				}
-								
-				else if(dir[3]){
-					console.log('col left');
-					this.x = elist.entities[e].x - elist.entities[e].width/2 - this.width/2;
-				}
-				else if(dir[4]){
-					console.log('col right');
-					this.x = elist.entities[e].x + elist.entities[e].width/2 + this.width/2;
-				}
-			}
-			else{
-								
-				
-			}
-
-			if(dir == 1 || dir == 2){
-				realy = 0;
-			}
-			if(dir == 3 || dir == 4){
+			if(dir == 1 || dir == 3){
 				realx = 0;
 			}
+			if(dir == 2 || dir == 3){
+				realy = 0;
+			}
+
+				
 			
 		}
 
@@ -243,6 +217,37 @@ game = function(){
 }
 
 //*************************************************************************************
+// Object Tile Mapper
+//*************************************************************************************
+
+function TileMapper(params){
+
+	// make sure the tile is within the bounds of the canvas
+	this.convert = function(at_x, at_y){
+		var x, y;
+		x = Math.floor(at_x/this.tile_width);
+		y = Math.floor(at_y/this.tile_height);
+
+		return [x, y];
+	}
+
+	this.convertT = function(at_x, at_y){
+		var x, y;
+		x = at_x*this.tile_width + 20;
+		y = at_y*this.tile_height + 20;
+		return [x, y];
+	}
+
+	this.tile_width = params.twidth;
+	this.tile_height = params.theight;
+	this.width = params.width;
+	this.height = params.height;
+	this.map_width = this.width / this.tile_width;
+	this.map_height = this.height / this.tile_height;
+
+}
+
+//*************************************************************************************
 // Starting the actual game logic here...
 //*************************************************************************************
 window.onload = function(){
@@ -260,16 +265,21 @@ window.onload = function(){
 	height = canvas.height;
 
 	var fps = 60;
-	p = new Player({'context': _context, 'width': 32, 'height': 48, 'x': 50, 'y': 150});
+	p = new Player({'context': _context, 'width': 32, 'height': 48, 'x': 50, 'y': 350});
 	p.image = new Image();
 	p.image.src = "images/terra_rip_final.png";
 
+	t = new TileMapper({'twidth': 40, 'theight': 40, 'width': 640, 'height': 480});
+
+	n = t.convertT(2, 11);
+
+
 	elist = new EntityList();
-	// elist.add(new Block({'context': _context, 'x': 20, 'y': 20}));
-	// elist.add(new Block({'context': _context, 'x': 60, 'y': 20}));
-	// elist.add(new Block({'context': _context, 'x': 100, 'y': 20}));
-	// elist.add(new Block({'context': _context, 'x': 140, 'y': 20}));
-	// elist.add(new Block({'context': _context, 'x': 180, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': n[0], 'y': n[1]}));
+	elist.add(new Block({'context': _context, 'x': 60, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 100, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 140, 'y': 20}));
+	elist.add(new Block({'context': _context, 'x': 180, 'y': 20}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 20}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 20}));
 	elist.add(new Block({'context': _context, 'x': 220, 'y': 60}));
@@ -284,9 +294,9 @@ window.onload = function(){
 
 	elist.add(new Block({'context': _context, 'x': 380, 'y': 180}));
 	elist.add(new Block({'context': _context, 'x': 380, 'y': 220}));
-	// elist.add(new Block({'context': _context, 'x': 380, 'y': 260}));
-	// elist.add(new Block({'context': _context, 'x': 380, 'y': 300}));
-	// elist.add(new Block({'context': _context, 'x': 380, 'y': 340}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 260}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 300}));
+	elist.add(new Block({'context': _context, 'x': 380, 'y': 340}));
 
 	init();
 	// Set up the initial game stuff..

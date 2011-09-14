@@ -348,43 +348,82 @@ function Entity(init){
   this.inheritFrom(init.context, init.sprite_path);
 
   this.collidesAt = function(entity){
-    var left1 = (this.x-this.width/2);
-    var left2 = (entity.x-entity.width/2);
-    var right1 = (this.x+this.width/2);
-    var right2 = (entity.x+entity.width/2);
-    var top1 = (this.y-this.height/2);
-    var top2 = (entity.y-entity.height/2);
-    var bottom1 = (this.y+this.height/2);
-    var bottom2 = (entity.y+entity.height/2);
+    rect1 = {
+      'top':    (this.y-this.height/2),
+      'left':   (this.x-this.width/2),
+      'bottom': (this.y+this.height/2),
+      'right':  (this.x+this.width/2)
+    }
 
-    var ret = [false, false, false, false, false];
+    rect2 = {
+      'top':    (entity.y-entity.height/2),
+      'left':   (entity.x-entity.width/2),
+      'bottom': (entity.y+entity.height/2),
+      'right':  (entity.x+entity.width/2)
+    }
 
-    // TODO add the rest of the detection here. the top boundry and the lower boundry for the sides etc.
-    if(bottom1 > top2 && bottom1 < bottom2 && this.x < (entity.x+entity.width/2) && this.x > (entity.x-entity.width/2))  ret[1] = true; // im colliding with the top    of entity
-    if(top1 < bottom2 && top1 > top2 && this.x < (entity.x+entity.width/2) && this.x > (entity.x-entity.width/2))        ret[2] = true; // im colliding with the bottom of entity
-    if(right1 > left2 && right1 < right2 && this.y < (entity.y+entity.height/2) && this.y > (entity.y-entity.height/2))  ret[3] = true; // im colliding with the left   of entity
-    if(left1 < right2 && left1 > left2 && this.y < (entity.y+entity.height/2) && this.y > (entity.y-entity.height/2))    ret[4] = true; // im colliding with the right  of entity
-
-    return ret;
+    var a=rect1.bottom < rect2.top;
+    var b=rect1.top > rect2.bottom;
+    var c=rect1.left > rect2.right;
+    var d=rect1.right < rect2.left;
+    
+    return !(a || b || c || d);
   }
 
-  this.collidesAt2 = function(entity){
-    var left1 = (this.x-this.width/2);
-    var left2 = (entity.x-entity.width/2);
-    var right1 = (this.x+this.width/2);
-    var right2 = (entity.x+entity.width/2);
-    var top1 = (this.y-this.height/2);
-    var top2 = (entity.y-entity.height/2);
-    var bottom1 = (this.y+this.height/2);
-    var bottom2 = (entity.y+entity.height/2);
+  this.collidesAt2 = function(entity){ // solid collision due to a change!
+    rect1 = {
+      'x': this.x,
+      'y': this.y,
+      'top':    (this.y-this.height/2),
+      'left':   (this.x-this.width/2),
+      'bottom': (this.y+this.height/2),
+      'right':  (this.x+this.width/2)
+    }
 
-    var ret = [false, false, false, false, false];
+    rect2 = {
+      'x': entity.x,
+      'y': entity.y,
+      'top':    (entity.y-entity.height/2),
+      'left':   (entity.x-entity.width/2),
+      'bottom': (entity.y+entity.height/2),
+      'right':  (entity.x+entity.width/2)
+    }
 
-    // TODO add the rest of the detection here. the top boundry and the lower boundry for the sides etc.
-    if(bottom1 > top2    && bottom1 < bottom2 && (( left1 < right2 && left1 > left2   ) || (right1  > left2     && right1  < right2 ))) ret[1] = true; // im colliding with the top    of entity
-    if(top1    < bottom2 && top1    > top2    && (( left1 < right2 && left1 > left2   ) || (right1  > left2     && right1  < right2 ))) ret[2] = true; // im colliding with the bottom of entity
-    if(right1  > left2   && right1  < right2  && ((  top1 > top2   && top1  < bottom2 ) || (bottom1 < bottom2   && bottom1 > top2   ))) ret[3] = true; // in colliding with the left   of entity
-    if(left1   < right2  && left1   > left2   && ((  top1 > top2   && top1  < bottom2 ) || (bottom1 < bottom2   && bottom1 > top2   ))) ret[4] = true; // im colliding with the right  of entity
+    var ret = 0;
+
+    // check the x
+    if(rect1.right + this.ax > rect2.left && rect1.right+this.ax < rect2.right){
+      if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top)){
+        this.ax = 0;
+        this.x = rect2.left-this.width/2;
+        ret = 1;
+      }
+    }else if(rect1.left+this.ax < rect2.right && rect1.left+this.ax > rect2.left){
+      if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top)){
+        this.ax = 0;
+        this.x = rect2.right+this.width/2;
+        ret = 1;
+      }
+    }
+
+    // check the y
+    if((rect1.top + this.ay) < rect2.bottom && (rect1.top + this.ay) > rect2.top){
+      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right)){
+        this.ay = 0;
+        this.y = rect2.bottom+(this.height/2);
+        ret = 2;
+        if(ret == 1) ret = 3;
+      }
+    }
+    else if(rect1.bottom+this.ay > rect2.top && rect1.bottom+this.ay < rect2.bottom){
+      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right)){
+        this.ay = 0;
+        this.y = rect2.top-this.height/2;
+
+        ret = 2;
+        if(ret == 1) ret = 3;
+      }
+    }
 
     return ret;
   }
