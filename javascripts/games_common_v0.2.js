@@ -393,22 +393,23 @@ function Entity(init){
 
     // check the x
     if(rect1.right + this.ax > rect2.left && rect1.right+this.ax < rect2.right){
-      if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top)){
+      if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top) || (this.y < rect2.bottom && this.y > rect2.top)){
         this.ax = 0;
         this.x = rect2.left-this.width/2;
         ret = 1;
       }
     }else if(rect1.left+this.ax < rect2.right && rect1.left+this.ax > rect2.left){
-      if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top)){
+      if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top) || (this.y < rect2.bottom && this.y > rect2.top)){
         this.ax = 0;
         this.x = rect2.right+this.width/2;
         ret = 1;
       }
     }
 
-    // check the y
+    // check the y 
+    // TODO: Need to figure out the height being bigger than the object
     if((rect1.top + this.ay) < rect2.bottom && (rect1.top + this.ay) > rect2.top){
-      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right)){
+      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && this.x > rect2.left)){
         this.ay = 0;
         this.y = rect2.bottom+(this.height/2);
         ret = 2;
@@ -416,7 +417,7 @@ function Entity(init){
       }
     }
     else if(rect1.bottom+this.ay > rect2.top && rect1.bottom+this.ay < rect2.bottom){
-      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right)){
+      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && this.x > rect2.left)){
         this.ay = 0;
         this.y = rect2.top-this.height/2;
 
