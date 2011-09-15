@@ -100,33 +100,6 @@ function KeyHandler(use_mouse){
     this.keyStates[key.keyCode] = false;
     return true;
   }
-  
-  this.setMouse = function(e){
-    this.mousePos(e);
-    if(this.keyStates[0] == null) this.keyStates["mouse_left"] = false;
-    this.keyStates[0] = true;
-    return true;
-  }
-
-  this.unsetMouse = function(e){
-    this.mousePos(e);
-    this.keyStates[0] = false;
-    return true;
-  }
-
-  this.mousePos = function(e){
-    if(e == null) return null;
-    this.mx = e.pageX-this.listenOffsetX;
-    this.my = e.pageY-this.listenOffsetY;
-  }
-
-  this.mouse = function(){
-    return [this.mx, this.my];
-  }
-
-  this.stop = function(){
-    
-  }
 
   // This is just a getter to make the later syntax easier to read through
   this.key = function(key_value){
@@ -157,6 +130,22 @@ function KeyHandler(use_mouse){
   console.log("KeyHandler initialized!");
 }
 
+//-----------------------------------------------------------------------------------
+// MouseHandler: Input for the mouse
+//-----------------------------------------------------------------------------------
+
+function MouseHandler(){
+  this.attach(tag) = function(){
+    tag_el = document.getElementById(tag);
+    tag_el.addEventListener("mou")
+  }
+
+  // clientX pageX
+
+  listener;
+  this.mouse_x = 0;
+  this.mouse_y = 0;
+}
 
 //-----------------------------------------------------------------------------------
 // ImageHandler: This handles static images not frames just images
@@ -409,7 +398,7 @@ function Entity(init){
     // check the y 
     // TODO: Need to figure out the height being bigger than the object
     if((rect1.top + this.ay) < rect2.bottom && (rect1.top + this.ay) > rect2.top){
-      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && this.x > rect2.left)){
+      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && rect1.x > rect2.left)){
         this.ay = 0;
         this.y = rect2.bottom+(this.height/2);
         ret = 2;
@@ -417,7 +406,7 @@ function Entity(init){
       }
     }
     else if(rect1.bottom+this.ay > rect2.top && rect1.bottom+this.ay < rect2.bottom){
-      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && this.x > rect2.left)){
+      if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && rect1.x > rect2.left)){
         this.ay = 0;
         this.y = rect2.top-this.height/2;
 
