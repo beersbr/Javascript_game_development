@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html>
 <head>
 <title>Don't touch that!</title>
@@ -253,6 +253,8 @@ function TileMapper(params){
 window.onload = function(){
 	fps_c = 0;
 	key = new KeyHandler(false);
+	mouse = new MouseHandler();
+	mouse.attach('canvas');
 	canvas = document.getElementById("canvas");
 	context = canvas.getContext('2d');
 
@@ -303,10 +305,12 @@ window.onload = function(){
 	game_interval = setInterval(game, 1000/fps);
 	fps_func = setInterval(fps_counter, 1000);
 
-}	
+}
 </script>
 </head>
 <body>
-  <canvas id='canvas' width="640px" height="480px"></canvas>
+	<div>
+		<canvas id='canvas' width="640px" height="480px"></canvas>
+	</div>
 </body>
 </html>
