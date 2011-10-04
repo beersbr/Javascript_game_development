@@ -10,7 +10,9 @@
 </style>
 
 <script type="text/javascript" src="javascripts/keyHandler.js"></script>
+<script type="text/javascript" src="javascripts/jquery.js"></script>
 <script>
+
 
 var game = {
   // some namespaced vars for dealing with the canvas
@@ -47,7 +49,14 @@ var game = {
 
     // prepare game objects
     game.player = new game.node({x: 150, y: 150, w: 10, h: 10, shape: "circle"});
-    game.level = new game.levels({walls: [{x: 40, y: 0, w: 50, h: 200}, {x: 0, y: 460, w: 640, h: 20}, {x: 620, y: 0, w: 20, h: 640}] });
+    // game.level1 = null;
+    // $.getJSON('json/level1.json', function(data){
+      // game.level1 = JSON.parse(data);
+      // console.log(game.level1);
+    // });
+    game.level = new game.levels({walls: [{x: 40, y: 0, w: 50, h: 200}, {x: 0, y: 460, w: 640, h: 20}, {x: 620, y: 0, w: 20, h: 640}, {x: 0, y: 350, w: 350, h: 20}] });
+    // game.level = new game.levels(game.level1);
+
     game.space = new game.world({gravity: 8, friction: 0.97, level: game.level});
 
     return true;
@@ -73,6 +82,7 @@ var game = {
         var o = world.walls[i];
         if(this.collision(o)){
           // collision happens here!
+          console.log("collsion");
         }
       }
       
