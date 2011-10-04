@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>willlson</title>
+<style>
+  body{
+    background: #330033;
+  }
+
+</style>
+
+<script type="text/javascript" src="javascripts/keyHandler.js"></script>
+<script>
+
+var game = {
+  // some namespaced vars for dealing with the canvas
+  height: 0,
+  width: 0,
+  screen: null,
+  screen_ctx: null,
+  buffer: null,
+  buffer_ctx: null,
+  fps: 48,
+  key: null,
+
+  fps_tick: 0,
+  ticker: null,
+
+  init: function(canvas_id, p){
+    console.log("init");
+    game.screen = document.getElementById(canvas_id);
+    game.screen_ctx = game.screen.getContext('2d');
+
+    game.width = game.screen.width;
+    game.height = game.screen.height;
+
+    game.buffer = document.createElement('canvas');
+    game.buffer.width = game.width;
+    game.buffer.height = game.height;
+    game.buffer_ctx = game.buffer.getContext('2d');
+
+    p = p || {};
+    if(p.key == true){
+      game.key = new keyHandler;
+      console.log("Using keyboard");
+    }
+
+    // prepare game objects
+    game.player = new game.node({x: 150, y: 150, w: 10, h: 10, shape: "circle"});
+    game.level = new game.levels({walls: [{x: 40, y: 0, w: 50, h: 200}, {x: 0, y: 460, w: 640, h: 20}, {x: 620, y: 0, w: 20, h: 640}] });
+    game.space = new game.world({gravity: 8, friction: 0.97, level: game.level});
+
+    return true;
+  },
+
+  node: function(p){
+    // member variables
+    this.x = p.x;
+    this.y = p.y;
+    this.shape = p.shape;
+    this.width = p.w;
+    this.height = p.h;
+
+    // acceleration in each direction
+    this.ax = 0;
+    this.ay = 0;
+
+    this.update = function(world){
+      this.x += this.ax *= world.friction;
+      this.y += (this.ay *= world.friction) + world.gravity;
+
+      for(i in world.walls){
+        var o = world.walls[i];
+        if(this.collision(o)){
+          // collision happens here!
+        }
+      }
+      
+    }
+
+    // returns true if this collides with node, a shape must have an x, y, width and height. In this case there will only be rects
+    this.collision = function(shape){
+
+      // we are assuming that we are a cirlce here
+      //if(this.shape == "circle"){}
+
+      var dist_x = Math.abs(this.x - (shape.x + (shape.w/2)));
+      var dist_y = Math.abs(this.y - (shape.y + (shape.h/2)));
+
+      if(dist_x > ((shape.w/2) + this.width)){ return false; }
+      if(dist_y > ((shape.h/2) + this.width)){ return false; }
+
+      if(dist_x <= (shape.w/2)){ return true; }
+      if(dist_y <= (shape.h/2)){ return true; }
+
+      corner = Math.pow((dist_x - shape.w/2), 2) + Math.pow((dist_y - shape.h/2), 2);
+      return (corner <= Math.pow(this.width, 2));
+
+    }
+
+    // draws to the global buffer which is defined in game
+    this.draw = function(){
+      game.buffer_ctx.save();
+      game.buffer_ctx.fillStyle = "rgb(0, 100, 100)";
+      game.buffer_ctx.beginPath();
+      game.buffer_ctx.arc(this.x, this.y, this.width, 0, Math.PI*2, true);
+      game.buffer_ctx.closePath();
+      game.buffer_ctx.fill();
+      game.buffer_ctx.restore();
+      return true;
+    }
+  },
+
+  levels: function(level_json){
+    this.walls = level_json.walls;
+
+    // TODO: Get these working before we draw them.
+    // this.objects = level_json.objects;
+
+    this.draw = function(){
+      game.buffer_ctx.save();
+      game.buffer_ctx.fillStyle = "rgb(255,255,255)";
+
+      for(i in this.walls){
+        var o = this.walls[i];
+        game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
+      }
+
+      game.buffer_ctx.restore();
+    }
+  },
+
+  world: function(p){
+    this.gravity = p.gravity;
+    this.friction = p.friction;
+
+    this.walls = p.level.walls;
+  },
+
+  // This is the main game loop
+  main: function(){
+
+    // get input
+    if(game.key.keyIs('q')){
+      clearInterval(game.ticker);
+    }
+
+    // player input
+    if(game.key.keyIs('w')){
+      game.player.ay -= 1;
+    }
+    if(game.key.keyIs('a')){
+      game.player.ax -= 1;
+    }
+    if(game.key.keyIs('s')){
+      game.player.ay += 1;
+    }
+    if(game.key.keyIs('d')){
+      game.player.ax += 1;
+    }
+
+    game.player.update(game.space);
+
+    game.buffer_ctx.fillStyle = "rgb(0, 0, 0)";
+    game.buffer_ctx.fillRect(0, 0, game.width, game.height);
+
+    game.level.draw();
+    game.player.draw();
+
+    game.flip();
+  },
+
+  flip: function(){
+    game.screen_ctx.drawImage(game.buffer, 0, 0);
+  }
+
+}
+
+window.onload = function(){
+  game.init('canvas', {key: true});
+  game.ticker = setInterval(game.main, 1000/game.fps);
+
+}
+
+</script>
+</head>
+<body>
+  <div>
+    <canvas id="canvas" width='640' height='480'></canvas>
+  </div>
+</body>
+</html>
