@@ -4,7 +4,7 @@ body{
 }
 
 canvas{
-	border: 3px solid black;
+	border: 0px solid black;
 	display: block;
 	margin: auto;
 	width: 640px;
