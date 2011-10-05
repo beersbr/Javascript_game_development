@@ -15,7 +15,6 @@
 <script type="text/javascript" src="javascripts/jquery.js"></script>
 <script>
 
-
 var game = {
   // some namespaced vars for dealing with the canvas
   height: 0,
@@ -29,6 +28,8 @@ var game = {
 
   fps_tick: 0,
   ticker: null,
+
+  game_state: "playing",
 
   init: function(canvas_id, p){
     console.log("init");
@@ -54,12 +55,14 @@ var game = {
 
     // get the first level
     game.level1 = null;
-    $.ajax({url:'json/level1.json',
+    $.ajax({url:'./json/level1.json',
             async: false,
             success: function(data){
-              console.log("here");
-              game.level1 = $.parseJSON(data);
-              console.log('data: '+data);
+              game.level1 = data;
+              if(!(game.level1 instanceof Object)){
+                game.level1 = $.parseJSON(data);
+              }
+              // console.log('data: '+game.level1);
             }
     });
 
@@ -93,22 +96,27 @@ var game = {
           switch(o.type){
             case "wall":
               // you lose!
-              // console.log("WALL!");
               break;
 
             case "slow":
-              // console.log("SLOW!");
               friction = 0.8;
               gravity = 2;
               break;
 
             case "speed_left":
-              // console.log("SPEED LEFT");
               this.ax -= 1.3;
               break;
 
             case "reverse_gravity":
               gravity = !gravity;
+              break;
+
+            case "level_finish":
+              this.ax = 0;
+              this.ay = 0;
+              friction = 0;
+              gravity = 0;
+              console.log("DONE!");
               break;
           }
 
@@ -196,34 +204,50 @@ var game = {
   // This is the main game loop
   main: function(){
 
+    // check the game state
+    switch(game.game_state){
+      
+    }
+
     // get input
-    if(game.key.keyIs('q')){
-      clearInterval(game.ticker);
+    if(game.key.keyPressed('q')){
+      if(game.game_state == "playing"){
+        game.game_state = "paused";
+        console.log("paused");
+      }
+      else if(game.game_state == "paused"){
+        game.game_state = "playing";
+        console.log("playing");
+      }
+
     }
 
-    // player input
-    if(game.key.keyIs('w')){
-      game.player.ay -= 1;
-    }
-    if(game.key.keyIs('a')){
-      game.player.ax -= 1;
-    }
-    if(game.key.keyIs('s')){
-      game.player.ay += 1;
-    }
-    if(game.key.keyIs('d')){
-      game.player.ax += 1;
-    }
+    if(game.game_state == "playing"){
 
-    game.player.update(game.space);
+      // player input
+      if(game.key.keyIs('w')){
+        game.player.ay -= 1;
+      }
+      if(game.key.keyIs('a')){
+        game.player.ax -= 1;
+      }
+      if(game.key.keyIs('s')){
+        game.player.ay += 1;
+      }
+      if(game.key.keyIs('d')){
+        game.player.ax += 1;
+      }
 
-    game.buffer_ctx.fillStyle = "rgb(0, 0, 0)";
-    game.buffer_ctx.fillRect(0, 0, game.width, game.height);
+      game.player.update(game.space);
 
-    game.level.draw();
-    game.player.draw();
+      game.buffer_ctx.fillStyle = "rgb(0, 0, 0)";
+      game.buffer_ctx.fillRect(0, 0, game.width, game.height);
 
-    game.flip();
+      game.level.draw();
+      game.player.draw();
+
+      game.flip();
+    }
   },
 
   flip: function(){
