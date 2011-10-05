@@ -30,6 +30,7 @@ var game = {
   ticker: null,
 
   game_state: "playing",
+  level_number: 0,
 
   init: function(canvas_id, p){
     console.log("init");
@@ -51,25 +52,31 @@ var game = {
     }
 
     // prepare game objects
-    game.player = new game.node({x: 150, y: 150, w: 10, h: 10, shape: "circle"});
+    game.player = new game.node({ w: 10, h: 10, shape: "circle", image: "./images/ball.png"});
 
-    // get the first level
-    game.level1 = null;
-    $.ajax({url:'./json/level1.json',
-            async: false,
-            success: function(data){
-              game.level1 = data;
-              if(!(game.level1 instanceof Object)){
-                game.level1 = $.parseJSON(data);
-              }
-              // console.log('data: '+game.level1);
-            }
-    });
+    game.load_level(1);
 
-    game.level = new game.levels(game.level1);
     game.space = new game.world({gravity: 8, friction: 0.97, level: game.level});
 
     return true;
+  },
+
+  load_level: function(){
+    var current_level = {};
+
+    $.ajax({url:'./json/level'+(game.level_number+=1)+'.json',
+            async: false,
+            success: function(data){
+              current_level = data;
+              if(!(current_level instanceof Object)){
+                current_level = $.parseJSON(data);
+              }
+            }
+    });
+
+    game.level = new game.levels(current_level);
+    game.player.x = current_level["start"].x;
+    game.player.y = current_level["start"].y;
   },
 
   node: function(p){
@@ -84,6 +91,16 @@ var game = {
     this.ax = 0;
     this.ay = 0;
 
+    this.image_path = p.image;
+    this.image = new Image();
+    this.image.src = this.image_path;
+
+    this.image_overlay = new Image();
+    this.image_overlay.src = './images/ball_shadow.png';
+
+    this.rot = 0;
+    this.rot_friction = .87;
+
     this.update = function(world){
       friction = world.friction;
       gravity = world.gravity
@@ -95,7 +112,7 @@ var game = {
 
           switch(o.type){
             case "wall":
-              // you lose!
+              // you die
               break;
 
             case "slow":
@@ -112,11 +129,7 @@ var game = {
               break;
 
             case "level_finish":
-              this.ax = 0;
-              this.ay = 0;
-              friction = 0;
-              gravity = 0;
-              console.log("DONE!");
+              game.load_level();
               break;
           }
 
@@ -125,6 +138,8 @@ var game = {
 
       this.x += this.ax *= friction;
       this.y += (this.ay *= friction) + gravity;
+
+      this.rot += this.ax*3;
 
     }
 
@@ -151,12 +166,12 @@ var game = {
     // draws to the global buffer which is defined in game
     this.draw = function(){
       game.buffer_ctx.save();
-      game.buffer_ctx.fillStyle = "rgb(0, 100, 100)";
-      game.buffer_ctx.beginPath();
-      game.buffer_ctx.arc(this.x, this.y, this.width, 0, Math.PI*2, true);
-      game.buffer_ctx.closePath();
-      game.buffer_ctx.fill();
+      game.buffer_ctx.translate(this.x, this.y);
+      game.buffer_ctx.rotate(this.rot * Math.PI/180);
+      game.buffer_ctx.drawImage(this.image, 0-this.width, 0-this.width, 20, 20);
       game.buffer_ctx.restore();
+
+      game.buffer_ctx.drawImage(this.image_overlay, this.x-this.width, this.y-this.width, 20, 20);
       return true;
     }
   },
@@ -176,6 +191,7 @@ var game = {
         switch(o.type){
           case "wall":
             game.buffer_ctx.fillStyle = "rgb(255,255,255)";
+
             break;
           case "slow":
             game.buffer_ctx.fillStyle = "rgb(155,155,255)";
